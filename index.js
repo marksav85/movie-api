@@ -151,6 +151,17 @@ app.get('/', (req, res) => {
     }
   });
 
+  app.get('/movies/genre/:name', (req, res) => {
+    const { name } = req.params;
+    const genre = movies.find(movie => movie.genre.name === name);
+
+    if (genre) {
+      res.status(200).json(genre.genre);
+    } else {
+      res.status(400).send('Genre not found');
+    }
+  });
+
  
   app.use((err, req, res, next) => {
     console.error(err.stack);
