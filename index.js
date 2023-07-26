@@ -1,6 +1,8 @@
 const express = require('express'),
       app = express(),
-      morgan = require('morgan');
+      morgan = require('morgan'),
+      bodyParser = require('body-parser'),
+      uuid = require('uuid');
 
 app.use(morgan('common'));
 
