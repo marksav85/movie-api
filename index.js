@@ -10,34 +10,124 @@ app.use(express.static('public'));
 
 let movies = [
   {
-    title: 'Fast and Furious 1', 
+    title: 'Fast and Furious 1',
+    description: 'A story about a man named Dom, his car and his ability to defy physics with it',
+    genre: {
+      name: 'Auto-Fantasy',
+      description: 'A genre that uses cars that can perform magic'
+    } ,
+    director: {
+      name: 'Car Fan',
+      bio: 'A director who loves cars',
+    },
   },
   {
     title: 'Fast and Furious 2',
+    description: 'A second story about a man named Dom, his car and his ability to defy physics with it',
+    genre: {
+      name: 'Auto-Fantasy',
+      description: 'A genre that uses cars that can perform magic'
+    } ,
+    director: {
+      name: 'Car Fan',
+      bio: 'A director who loves cars',
+    },
   },
   {
     title: 'Fast and Furious 3',
+    description: 'A third story about a man named Dom, his car and his ability to defy physics with it',
+    genre: {
+      name: 'Auto-Fantasy',
+      description: 'A genre that uses cars that can perform magic'
+    } ,
+    director: {
+      name: 'Car Fan',
+      bio: 'A director who loves cars',
+    },
   },
   {
     title: 'Fast and Furious 4',
+    description: 'A fourth story about a man named Dom, his car and his ability to defy physics with it',
+    genre: {
+      name: 'Auto-Fantasy',
+      description: 'A genre that uses cars that can perform magic'
+    } ,
+    director: {
+      name: 'Car Fan',
+      bio: 'A director who loves cars',
+    },
   },
   {
     title: 'Fast and Furious 5',
+    description: 'A fifth story about a man named Dom, his car and his ability to defy physics with it',
+    genre: {
+      name: 'Auto-Fantasy',
+      description: 'A genre that uses cars that can perform magic'
+    } ,
+    director: {
+      name: 'Car Fan',
+      bio: 'A director who loves cars',
+    },
   },
   {
     title: 'Fast and Furious 6',
+    description: 'A sixth story about a man named Dom, his car and his ability to defy physics with it',
+    genre: {
+      name: 'Auto-Fantasy',
+      description: 'A genre that uses cars that can perform magic'
+    } ,
+    director: {
+      name: 'Car Fan',
+      bio: 'A director who loves cars',
+    },
   },
   {
     title: 'Fast and Furious 7',
+    description: 'A seventh story about a man named Dom, his car and his ability to defy physics with it',
+    genre: {
+      name: 'Auto-Fantasy',
+      description: 'A genre that uses cars that can perform magic'
+    } ,
+    director: {
+      name: 'Car Fan',
+      bio: 'A director who loves cars',
+    },
   },
   {
     title: 'Fast and Furious 8',
+    description: 'An eigth story about a man named Dom, his car and his ability to defy physics with it',
+    genre: {
+      name: 'Auto-Fantasy',
+      description: 'A genre that uses cars that can perform magic'
+    } ,
+    director: {
+      name: 'Car Fan',
+      bio: 'A director who loves cars',
+    },
   },
   {
     title: 'Fast and Furious 9',
+    description: 'A ninth story about a man named Dom, his car and his ability to defy physics with it',
+    genre: {
+      name: 'Auto-Fantasy',
+      description: 'A genre that uses cars that can perform magic'
+    } ,
+    director: {
+      name: 'Car Fan',
+      bio: 'A director who loves cars',
+    },
   },
   {
     title: 'Fast and Furious 10',
+    description: 'A tenth story about a man named Dom, his car and his ability to defy physics with it',
+    genre: {
+      name: 'Auto-Fantasy',
+      description: 'A genre that uses cars that can perform magic'
+    } ,
+    director: {
+      name: 'Car Fan',
+      bio: 'A director who loves cars',
+    },
   }
 ];
 
