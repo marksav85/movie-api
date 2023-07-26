@@ -1,12 +1,12 @@
-const express = require('express');
-const app = express();
-const morgan = require('morgan');
+const express = require('express'),
+      app = express(),
+      morgan = require('morgan');
 
 app.use(morgan('common'));
 
 app.use(express.static('public'));
 
-let topMovies = [
+let movies = [
   {
     title: 'Fast and Furious 1', 
   },
@@ -45,7 +45,7 @@ app.get('/', (req, res) => {
   });
   
   app.get('/movies', (req, res) => {
-    res.json(topMovies);
+    res.json(movies);
 
   });
  
