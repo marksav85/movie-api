@@ -5,7 +5,7 @@ const express = require('express'),
       uuid = require('uuid');
 
 app.use(morgan('common'));
-
+app.use(bodyParser.json());
 app.use(express.static('public'));
 
 let movies = [
@@ -47,9 +47,20 @@ app.get('/', (req, res) => {
   });
   
   app.get('/movies', (req, res) => {
-    res.json(movies);
-
+    res.status(200).json(movies);
   });
+
+  app.get('/movies/:title', (req, res) => {
+    const { title } = req.params;
+    const movie = movies.find(movie => movie.title === title);
+   
+    if (movie) {
+      res.status(200).json(movie);
+    } else {
+      res.status(400).send('Movie not found');
+    }
+  });
+
  
   app.use((err, req, res, next) => {
     console.error(err.stack);
