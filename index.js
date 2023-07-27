@@ -8,6 +8,19 @@ app.use(morgan('common'));
 app.use(bodyParser.json());
 app.use(express.static('public'));
 
+let users = [
+  {
+    id: 1,
+    name: 'John Doe',
+    favoriteMovies: ['Fast and Furious 1', 'Fast and Furious 2', 'Fast and Furious 3']
+  },
+  {
+    id: 2,
+    name: 'Jane Doe',
+    favoriteMovies: ['Fast and Furious 4', 'Fast and Furious 5', 'Fast and Furious 6']
+  },
+]
+
 let movies = [
   {
     title: 'Fast and Furious 1',
@@ -19,7 +32,11 @@ let movies = [
     director: {
       name: 'Car Fan',
       bio: 'A director who loves cars',
+      birthYear: '1980',
+      deathYear: '2023'
     },
+    imageURL: 'insert image url here',
+    featured: true
   },
   {
     title: 'Fast and Furious 2',
@@ -31,7 +48,11 @@ let movies = [
     director: {
       name: 'Car Fan',
       bio: 'A director who loves cars',
+      birthYear: '1980',
+      deathYear: '2023'
     },
+    imageURL: 'insert image url here',
+    featured: true
   },
   {
     title: 'Fast and Furious 3',
@@ -43,7 +64,11 @@ let movies = [
     director: {
       name: 'Car Fan',
       bio: 'A director who loves cars',
+      birthYear: '1980',
+      deathYear: '2023'
     },
+    imageURL: 'insert image url here',
+    featured: true
   },
   {
     title: 'Fast and Furious 4',
@@ -55,7 +80,11 @@ let movies = [
     director: {
       name: 'Car Fan',
       bio: 'A director who loves cars',
+      birthYear: '1980',
+      deathYear: '2023'
     },
+    imageURL: 'insert image url here',
+    featured: true
   },
   {
     title: 'Fast and Furious 5',
@@ -67,7 +96,11 @@ let movies = [
     director: {
       name: 'Car Fan',
       bio: 'A director who loves cars',
+      birthYear: '1980',
+      deathYear: '2023'
     },
+    imageURL: 'insert image url here',
+    featured: true
   },
   {
     title: 'Fast and Furious 6',
@@ -79,7 +112,11 @@ let movies = [
     director: {
       name: 'Car Fan',
       bio: 'A director who loves cars',
+      birthYear: '1980',
+      deathYear: '2023'
     },
+    imageURL: 'insert image url here',
+    featured: true
   },
   {
     title: 'Fast and Furious 7',
@@ -91,7 +128,11 @@ let movies = [
     director: {
       name: 'Car Fan',
       bio: 'A director who loves cars',
+      birthYear: '1980',
+      deathYear: '2023'
     },
+    imageURL: 'insert image url here',
+    featured: true
   },
   {
     title: 'Fast and Furious 8',
@@ -103,7 +144,11 @@ let movies = [
     director: {
       name: 'Car Fan',
       bio: 'A director who loves cars',
+      birthYear: '1980',
+      deathYear: '2023'
     },
+    imageURL: 'insert image url here',
+    featured: true
   },
   {
     title: 'Fast and Furious 9',
@@ -115,7 +160,11 @@ let movies = [
     director: {
       name: 'Car Fan',
       bio: 'A director who loves cars',
+      birthYear: '1980',
+      deathYear: '2023'
     },
+    imageURL: 'insert image url here',
+    featured: true
   },
   {
     title: 'Fast and Furious 10',
@@ -127,7 +176,12 @@ let movies = [
     director: {
       name: 'Car Fan',
       bio: 'A director who loves cars',
+      birthYear: '1980',
+      deathYear: '2023'
     },
+    imageURL: 'insert image url here',
+    featured: true
+
   }
 ];
 
@@ -151,14 +205,25 @@ app.get('/', (req, res) => {
     }
   });
 
-  app.get('/movies/genre/:name', (req, res) => {
-    const { name } = req.params;
-    const genre = movies.find(movie => movie.genre.name === name);
+  app.get('/movies/genre/:genName', (req, res) => {
+    const { genName } = req.params;
+    const genre = movies.find(movie => movie.genre.name === genName);
 
     if (genre) {
       res.status(200).json(genre.genre);
     } else {
       res.status(400).send('Genre not found');
+    }
+  });
+
+  app.get('/movies/director/:dirName', (req, res) => {
+    const { dirName } = req.params;
+    const director = movies.find(movie => movie.director.name === dirName);
+
+    if (director) {
+      res.status(200).json(director.director);
+    } else {
+      res.status(400).send('Director not found');
     }
   });
 
