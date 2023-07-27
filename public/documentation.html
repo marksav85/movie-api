@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../styles/styles.css">
     <title>MyFlix API Documentation</title>
 </head>
 <body>
@@ -49,6 +50,124 @@
         <p>The API will be deployed to Heroku.</p>
 
     </main>
+    <section>
+        <h2>API Endpoints</h2>
+        <h4>Table showing the various requests one can make to the app and
+            their corresponding URL endpoints; the HTTP methods used to make the requests; and the
+            body data format your API might expect for each request and response and relevant examples.</h4>
+        <table>
+            <thead>
+                <tr>
+                    <th>Request</th>
+                    <th>URL</th>
+                    <th>HTTP Method</th>
+                    <th>Request body data format</th>
+                    <th>Response body data format</th>
+                    <th>Example</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Get a list of all movies</td>
+                    <td>/movies</td>
+                    <td>GET</td>
+                    <td>None</td>
+                    <td>A JSON array of objects, with each object containing data about a single movie.</td>
+                    <td>
+                        {<br>
+                        title: '[movie title]',<br>
+                        description: '[movie description]',<br>
+                        genre: {<br>
+                          name: '[genre name]',<br>
+                          description: '[genre description]'<br>
+                        } ,<br>
+                        director: {<br>
+                          name: '[director name]',<br>
+                          bio: '[bio]',<br>
+                          birthYear: '[director birth year]',<br>
+                          deathYear: '[director death year]'<br>
+                        },<br>
+                        imageURL: '[url of image]',<br>
+                        featured: [true or false] <br>
+                      },</td>
+                </tr>
+                <tr>
+                    <td>Get data about a single movie by title <br>
+                        Get data about a single movie by genre <br>
+                        Get data about a single movie by director
+
+                    </td>
+                    <td>/movies/[title] <br>
+                        /movies/genre/[genre] <br>
+                        /movies/director/[director] <br>
+                    </td>
+                    <td>GET</td>
+                    <td>None</td>
+                    <td>A JSON object containing data about a single movie/ genre/ director.</td>
+                    <td>
+                        title: '[movie title]' (etc.),<br>
+                        genre: {<br>
+                          name: '[genre name]',<br>
+                          description: '[genre description]'<br>
+                        } ,<br>
+                        director: {<br>
+                          name: '[director name]',<br>
+                          bio: '[bio]',<br>
+                          birthYear: '[director birth year]',<br>
+                          deathYear: '[director death year]'<br>
+                        },
+                    </td>
+                <tr>
+                    <td>Register a new user</td>
+                    <td>/users</td>
+                    <td>POST</td>
+                    <td>A JSON object holding data about the user to add, structured like: <br>
+                        { <br>
+                        name : "Paulina Gomez" <br>
+                        }
+                    </td>
+                    <td>A JSON object holding data about the student that was added, including an ID: <br>
+                        { <br>
+                        "name": "Paulina Gomez", <br>
+                        "id": "f5230738-2c5e-4420-a7d6-5cf8db35ade8" <br>
+                        } <br>
+                    </td>
+                    <td>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Add favourite movie to a user</td>
+                    <td>/users/[id]/[movie]</td>
+                    <td>POST</td>
+                    <td></td>
+                    <td>A text message indicating the movie was added</td>
+                    <td>[movie] added to favorites</td>
+                </tr>
+                <tr>
+                    <td>Remove favourite movie from a user</td>
+                    <td>/users/[id]/[movie]</td>
+                    <td>DELETE</td>
+                    <td></td>
+                    <td>A text message indicating the movie was removed</td>
+                    <td>[movie] removed from favorites</td>
+                <tr>
+                    <td>Delete a user</td>
+                    <td>/users/[id]</td>
+                    <td>DELETE</td>
+                    <td></td>
+                    <td>A text message indicating the user was deleted</td>
+                    <td>User [id] deleted</td>
+
+                    </td>
+                </tr>
+
+
+
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
     <footer>
 
     </footer>
