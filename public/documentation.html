@@ -126,7 +126,7 @@
                         name : "Paulina Gomez" <br>
                         }
                     </td>
-                    <td>A JSON object holding data about the student that was added, including an ID: <br>
+                    <td>A JSON object holding data about the user that was added, including an ID: <br>
                         { <br>
                         "name": "Paulina Gomez", <br>
                         "id": "f5230738-2c5e-4420-a7d6-5cf8db35ade8" <br>
@@ -136,10 +136,29 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>Update existing user name</td>
+                    <td>/users/[id]</td>
+                    <td>PUT</td>
+                    <td>A JSON object holding data about the name to add, structured like: <br>
+                        { <br>
+                        name : "Paulina Clark" <br>
+                        }
+                    </td>
+                    <td>A JSON object holding data about the user that was added, including an ID: <br>
+                        { <br>
+                        "id": 2, <br>
+                        "name": "Paulina Clark", <br>
+                        "favoriteMovies": []<br>
+                        }
+                    </td>
+                    <td>
+                    </td>
+                </tr>
+                <tr>
                     <td>Add favourite movie to a user</td>
                     <td>/users/[id]/[movie]</td>
                     <td>POST</td>
-                    <td></td>
+                    <td>None</td>
                     <td>A text message indicating the movie was added</td>
                     <td>[movie] added to favorites</td>
                 </tr>
@@ -147,22 +166,16 @@
                     <td>Remove favourite movie from a user</td>
                     <td>/users/[id]/[movie]</td>
                     <td>DELETE</td>
-                    <td></td>
+                    <td>None</td>
                     <td>A text message indicating the movie was removed</td>
                     <td>[movie] removed from favorites</td>
                 <tr>
                     <td>Delete a user</td>
                     <td>/users/[id]</td>
                     <td>DELETE</td>
-                    <td></td>
+                    <td>None</td>
                     <td>A text message indicating the user was deleted</td>
                     <td>User [id] deleted</td>
-
-                    </td>
-                </tr>
-
-
-
                 </tr>
             </tbody>
         </table>
