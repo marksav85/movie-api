@@ -185,6 +185,35 @@ let movies = [
   }
 ];
 
+// POST requests
+
+app.post('/users', (req, res) => {
+  let newUser = req.body;
+
+  if (newUser.name) {
+    newUser.id = uuid.v4();
+    users.push(newUser);
+    res.status(201).send(newUser);
+  } else {
+    res.status(400).send('User needs a name');
+  }
+});
+
+// PUT requests
+
+app.put('/users/:id', (req, res) => {
+  const { id } = req.params;
+  const updatedUser = req.body;
+  let user = users.find(user => user.id == id);
+
+  if (user) {
+    user.name = updatedUser.name;
+    res.status(200).json(user);
+  } else {
+    res.status(400).send('User not found');
+  }
+});
+
 // GET requests
 app.get('/', (req, res) => {
     res.send('Welcome to MyFlix!');
