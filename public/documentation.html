@@ -114,8 +114,8 @@
                         director: {<br>
                           name: '[director name]',<br>
                           bio: '[bio]',<br>
-                          birthYear: '[director birth year]',<br>
-                          deathYear: '[director death year]'<br>
+                          birth: '[director birth year]',<br>
+                          death: '[director death year]'<br>
                         },
                     </td>
                 <tr>
@@ -124,13 +124,13 @@
                     <td>POST</td>
                     <td>A JSON object holding data about the user to add, structured like: <br>
                         { <br>
-                        name : "Paulina Gomez" <br>
+                        username : "Paulina Gomez" <br>
                         }
                     </td>
                     <td>A JSON object holding data about the user that was added, including an ID: <br>
                         { <br>
-                        "name": "Paulina Gomez", <br>
-                        "id": "f5230738-2c5e-4420-a7d6-5cf8db35ade8" <br>
+                        "_id": ObjectId:("[id]")<br>
+                        "username": "Paulina Gomez" <br>
                         } <br>
                     </td>
                     <td>
@@ -142,13 +142,13 @@
                     <td>PUT</td>
                     <td>A JSON object holding data about the name to add, structured like: <br>
                         { <br>
-                        name : "Paulina Clark" <br>
+                        username : "Paulina Clark" <br>
                         }
                     </td>
                     <td>A JSON object holding data about the user that was added, including an ID: <br>
                         { <br>
-                        "id": 2, <br>
-                        "name": "Paulina Clark", <br>
+                        "_id": ObjectId:("[id]"), <br>
+                        "username": "Paulina Clark", <br>
                         "favoriteMovies": []<br>
                         }
                     </td>
