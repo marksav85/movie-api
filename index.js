@@ -15,6 +15,10 @@ app.use(express.json());
 app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 
+let auth = require('./auth')(app);
+const passport = require('passport');
+require('./passport');
+
 // POST requests
 
 //Add a user
@@ -52,7 +56,7 @@ app.post('/users', async (req, res) => {
 });
 
 // Add a movie to a user's list of favorites
-app.post('/users/:Username/movies/:MovieID', async (req, res) => {
+app.post('/users/:Username/movies/:MovieID', passport.authenticate('jwt', { session: false }), async (req, res) => {
   await Users.findOneAndUpdate({ Username: req.params.Username }, {
     $push: { FavoriteMovies: req.params.MovieID }
   },
@@ -69,7 +73,7 @@ app.post('/users/:Username/movies/:MovieID', async (req, res) => {
 // DELETE requests
 
 // Delete a user by username
-app.delete('/users/:Username', async (req, res) => {
+app.delete('/users/:Username', passport.authenticate('jwt', { session: false }), async (req, res) => {
   await Users.findOneAndRemove({ Username: req.params.Username})
   .then((user) => {
     if (!user) {
@@ -85,7 +89,7 @@ app.delete('/users/:Username', async (req, res) => {
 });
 
 // Delete a movie from a user's list of favorites
-app.delete('/users/:Username/movies/:MovieID', async (req, res) => {
+app.delete('/users/:Username/movies/:MovieID', passport.authenticate('jwt', { session: false }), async (req, res) => {
   await Users.findOneAndUpdate({ Username: req.params.Username }, {
     $pull: { FavoriteMovies: req.params.MovieID }
   },
@@ -114,7 +118,11 @@ app.delete('/users/:Username/movies/:MovieID', async (req, res) => {
   Birthday: Date
 }*/
 
-app.put('/users/:Username', async (req, res) => {
+app.put('/users/:Username', passport.authenticate('jwt', {session: false }), async (req, res) => {
+  // conditions to check
+  if (req.user.Username !== req.params.Username) {
+    return res.status(400).send('Permission denied');
+  } // condition ends
   await Users.findOneAndUpdate({ Username: req.params.Username }, { $set:
     {
       Username: req.body.Username,
@@ -136,7 +144,7 @@ app.put('/users/:Username', async (req, res) => {
 // GET requests
 
 // Get all users
-app.get('/users', async (req, res) => {
+app.get('/users', passport.authenticate('jwt', { session: false }), async (req, res) => {
   await Users.find()
   .then((users) => {
     res.status(201).json(users);
@@ -148,7 +156,7 @@ app.get('/users', async (req, res) => {
 });
 
 // Get a user by username
-app.get('/users/:Username', async (req, res) => {
+app.get('/users/:Username', passport.authenticate('jwt', { session: false }), async (req, res) => {
   await Users.findOne({ Username: req.params.Username })
   .then((user) => {
     res.json(user);
@@ -160,7 +168,7 @@ app.get('/users/:Username', async (req, res) => {
 });
 
 // Get all movies
-app.get('/movies', async (req, res) => {
+app.get('/movies', passport.authenticate('jwt', { session: false }), async (req, res) => {
   await Movies.find()
   .then((movies) => {
     res.status(201).json(movies);
@@ -172,7 +180,7 @@ app.get('/movies', async (req, res) => {
 });
 
 // Get a movie by title
-app.get('/movies/:Title', async (req, res) => {
+app.get('/movies/:Title', passport.authenticate('jwt', { session: false }), async (req, res) => {
   await Movies.findOne({ Title: req.params.Title })
   .then((movie) => {
     res.json(movie);
@@ -184,7 +192,7 @@ app.get('/movies/:Title', async (req, res) => {
 });
  
 // Get movie by genre
-app.get('/movies/genre/:Name', async (req, res) => {
+app.get('/movies/genre/:Name', passport.authenticate('jwt', { session: false }), async (req, res) => {
   await Movies.findOne({ 'Genre.Name': req.params.Name })
   .then((movie) => {
     res.json(movie.Genre);
@@ -196,7 +204,7 @@ app.get('/movies/genre/:Name', async (req, res) => {
 });
 
 // Get movie by director
-app.get('/movies/director/:Name', async (req, res) => {
+app.get('/movies/director/:Name', passport.authenticate('jwt', { session: false }), async (req, res) => {
   await Movies.findOne({ 'Director.Name': req.params.Name })
   .then((movie) => {
     res.json(movie.Director);
