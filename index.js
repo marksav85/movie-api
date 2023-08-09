@@ -62,7 +62,7 @@ app.post('/users',
       // If the user is not found, create a new user with the hashed password
       Users.create({
         Username: req.body.Username,
-        Password: req.body.Password,
+        Password: hashedPassword,
         Email: req.body.Email,
         Birthday: req.body.Birthday
       }).then((user) => {res.status(201).json(user) })
