@@ -34,13 +34,31 @@ require('./passport');
   Birthday: Date
 }*/
 
-app.post('/users', async (req, res) => {
+app.post('/users', 
+// Validation logic here for request
+// you can either use a chain of methods like .not().isEmpty() which means "opposite of isEmpty"
+// or use .isLength({min: 5}) which means minimum value of 5 characters allowed
+[ 
+  check('Username', 'Username is required').isLength({min: 5}),
+  check('Username', 'Username contains non alphanumeric characters - not allowed.').isAlphanumeric(),
+  check('Password', 'Password is required').not().isEmpty(),
+  check('Email', 'Email does not appear to be valid').isEmail()
+], 
+  async (req, res) => {
+  // check the validation object for errors
+  let errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({ errors: errors.array() });
+  }
+  // encrypts the password sent by the user when registering
   let hashedPassword = Users.hashPassword(req.body.Password);
+  // Check to see if a user with the username already exists
   await Users.findOne({ Username: req.body.Username })
   .then((user) => {
     if (user) {
       return res.status(400).send(req.body.Username + 'already exists');
     } else {
+      // If the user is not found, create a new user with the hashed password
       Users.create({
         Username: req.body.Username,
         Password: req.body.Password,
@@ -232,8 +250,9 @@ app.use((err, req, res, next) => {
 });
   
 // listen for requests
-app.listen(8080, () => {
-  console.log('Your app is listening on port 8080.');
+const port = process.env.PORT || 8080;
+app.listen(port, '0.0.0.0',() => {
+  console.log('Listening on Port ' + port);
 });
 
  
