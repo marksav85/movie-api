@@ -5,6 +5,7 @@ const express = require('express'),
       mongoose = require('mongoose'),
       Models = require('./models.js')
 
+const { check, validationResult } = require('express-validator');
 const Movies = Models.Movie;
 const Users = Models.User;
 mongoose.connect('mongodb://localhost:27017/myflixdb', { useNewUrlParser: true, useUnifiedTopology: true });
@@ -15,6 +16,8 @@ app.use(express.json());
 app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 
+const cors = require('cors');
+app.use(cors());
 let auth = require('./auth')(app);
 const passport = require('passport');
 require('./passport');
@@ -32,6 +35,7 @@ require('./passport');
 }*/
 
 app.post('/users', async (req, res) => {
+  let hashedPassword = Users.hashPassword(req.body.Password);
   await Users.findOne({ Username: req.body.Username })
   .then((user) => {
     if (user) {
