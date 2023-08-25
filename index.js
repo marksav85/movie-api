@@ -175,6 +175,8 @@ app.put(
     if (req.user.Username !== req.params.Username) {
       return res.status(400).send("Permission denied");
     } // condition ends
+    // encrypts the password sent by the user when updating
+    let hashedPassword = Users.hashPassword(req.body.Password);
     await Users.findOneAndUpdate(
       { Username: req.params.Username },
       {
