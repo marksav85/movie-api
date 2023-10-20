@@ -4,7 +4,14 @@ const express = require("express"),
   uuid = require("uuid"),
   mongoose = require("mongoose"),
   Models = require("./models.js");
+const express = require("express"),
+  app = express(),
+  morgan = require("morgan"),
+  uuid = require("uuid"),
+  mongoose = require("mongoose"),
+  Models = require("./models.js");
 
+const { check, validationResult } = require("express-validator");
 const { check, validationResult } = require("express-validator");
 const Movies = Models.Movie;
 const Users = Models.User;
@@ -13,14 +20,23 @@ mongoose.connect(process.env.CONNECTION_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
+mongoose.connect(process.env.CONNECTION_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 
+app.use(morgan("common"));
 app.use(morgan("common"));
 app.use(express.json());
 app.use(express.static("public"));
 app.use(express.urlencoded({ extended: true }));
 
 const cors = require("cors");
+const cors = require("cors");
 app.use(cors());
+let auth = require("./auth")(app);
+const passport = require("passport");
+require("./passport");
 let auth = require("./auth")(app);
 const passport = require("passport");
 require("./passport");
@@ -95,8 +111,41 @@ app.post(
             });
         }
       })
+    // check the validation object for errors
+    let errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    }
+    // encrypts the password sent by the user when registering
+    let hashedPassword = Users.hashPassword(req.body.Password);
+    // Check to see if a user with the username already exists
+    await Users.findOne({ Username: req.body.Username })
+      .then((user) => {
+        if (user) {
+          return res.status(400).send(req.body.Username + "already exists");
+        } else {
+          // If the user is not found, create a new user with the hashed password
+          Users.create({
+            Username: req.body.Username,
+            Password: hashedPassword,
+            Email: req.body.Email,
+            Birthday: req.body.Birthday,
+          })
+            .then((user) => {
+              res.status(201).json(user);
+            })
+            .catch((error) => {
+              console.error(error);
+              res.status(500).send("Error: " + error);
+            });
+        }
+      })
       .catch((error) => {
         console.error(error);
+        res.status(500).send("Error: " + error);
+      });
+  }
+);
         res.status(500).send("Error: " + error);
       });
   }
@@ -497,16 +546,23 @@ app.get(
 // Landing Page welcome text
 app.get("/", (req, res) => {
   res.send("Welcome to MyFlix!");
+app.get("/", (req, res) => {
+  res.send("Welcome to MyFlix!");
 });
 
 // Error handling
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).send("Something broke!");
+  res.status(500).send("Something broke!");
 });
+
 
 // listen for requests
 const port = process.env.PORT || 8080;
 app.listen(port, "0.0.0.0", () => {
   console.log("Listening on Port " + port);
+app.listen(port, "0.0.0.0", () => {
+  console.log("Listening on Port " + port);
 });
+
