@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Global</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Global</h1>
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        <h2></h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+
+        
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
+
+        
+            
+<h4 class="name" id="DELETE/users/:Username"><span class="type-signature"></span>DELETE /users/:Username<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    Delete a user by username
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line150">line 150</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+    <h5>Examples</h5>
+    
+    <pre class="prettyprint"><code>Authentication: Bearer token (JWT)</code></pre>
+
+    <pre class="prettyprint"><code>Request data format{ "Username": ""}</code></pre>
+
+    <pre class="prettyprint"><code>Response data formatnone</code></pre>
+
+
+
+        
+            
+<h4 class="name" id="DELETE/users/:Username/movies/:MovieID"><span class="type-signature"></span>DELETE /users/:Username/movies/:MovieID<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    Delete a movie from a user's favorite list of movies
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line186">line 186</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+    <h5>Examples</h5>
+    
+    <pre class="prettyprint"><code>Authentication: Bearer token (JWT)</code></pre>
+
+    <pre class="prettyprint"><code>Request data format{ "Username": "","MovieID": ObjectID}</code></pre>
+
+    <pre class="prettyprint"><code>Response data format{ "FavoriteMovies": [ObjectID]}</code></pre>
+
+
+
+        
+            
+<h4 class="name" id="GET/movies"><span class="type-signature"></span>GET /movies<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    Get all movies
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line345">line 345</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+    <h5>Examples</h5>
+    
+    <pre class="prettyprint"><code>Authentication: Bearer token (JWT)</code></pre>
+
+    <pre class="prettyprint"><code>Request data formatnone</code></pre>
+
+    <pre class="prettyprint"><code>Response data format[  {    _id: ObjectID    "Title": "",    "Description": "",    "Genre": ObjectID,    "Director": [ObjectID],    "ImagePath": "",    "Featured": Boolean,  }]</code></pre>
+
+
+
+        
+            
+<h4 class="name" id="GET/movies/:Title"><span class="type-signature"></span>GET /movies/:Title<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    Get a movie by title
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line385">line 385</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+    <h5>Examples</h5>
+    
+    <pre class="prettyprint"><code>Authentication: Bearer token (JWT)</code></pre>
+
+    <pre class="prettyprint"><code>Request data formatnone</code></pre>
+
+    <pre class="prettyprint"><code>Response data format{  _id: ObjectID  "Title": "",  "Description": "",  "Genre": ObjectID,  "Director": [ObjectID],  "ImagePath": "",  "Featured": Boolean,}</code></pre>
+
+
+
+        
+            
+<h4 class="name" id="GET/movies/director/:Name"><span class="type-signature"></span>GET /movies/director/:Name<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    Get a movie by director
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line461">line 461</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+    <h5>Examples</h5>
+    
+    <pre class="prettyprint"><code>Authentication: Bearer token (JWT)</code></pre>
+
+    <pre class="prettyprint"><code>Request data formatnone</code></pre>
+
+    <pre class="prettyprint"><code>Response data format{  _id: ObjectID  "Title": "",  "Description": "",  "Genre": ObjectID,  "Director": [ObjectID],  "ImagePath": "",  "Featured": Boolean,}</code></pre>
+
+
+
+        
+            
+<h4 class="name" id="GET/movies/genre/:Name"><span class="type-signature"></span>GET /movies/genre/:Name<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    Get a movie by genre
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line423">line 423</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+    <h5>Examples</h5>
+    
+    <pre class="prettyprint"><code>Authentication: Bearer token (JWT)</code></pre>
+
+    <pre class="prettyprint"><code>Request data formatnone</code></pre>
+
+    <pre class="prettyprint"><code>Response data format{  _id: ObjectID  "Title": "",  "Description": "",  "Genre": ObjectID,  "Director": [ObjectID],  "ImagePath": "",  "Featured": Boolean,}</code></pre>
+
+
+
+        
+            
+<h4 class="name" id="GET/users/:Username"><span class="type-signature"></span>GET /users/:Username<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    Get a user's info, by username
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line305">line 305</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+    <h5>Examples</h5>
+    
+    <pre class="prettyprint"><code>Authentication: Bearer token (JWT)</code></pre>
+
+    <pre class="prettyprint"><code>Request data format{"Username": "","Password": ""}</code></pre>
+
+    <pre class="prettyprint"><code>Response data format{ "_id": ObjectID,"Username": "","Password": "","Email": "","Birthday": "","FavoriteMovies": [ObjectID]}</code></pre>
+
+
+
+        
+            
+<h4 class="name" id="POST/users/"><span class="type-signature"></span>POST /users/<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    Add a user
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line32">line 32</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+    <h5>Examples</h5>
+    
+    <pre class="prettyprint"><code>Authentication: noneRequest data format{ "Username": "", "Password": "", "Email": "", "Birthday:" ""}</code></pre>
+
+    <pre class="prettyprint"><code>Response data format{  "_id": ObjectID,  "Username": "",  "Password": "",  "Email": "",  "Birthday": "",  "FavoriteMovies": [ObjectID]}</code></pre>
+
+
+
+        
+            
+<h4 class="name" id="POST/users/:UserName/movies/:MovieID"><span class="type-signature"></span>POST /users/:UserName/movies/:MovieID<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    Add a movie to a user's favorite list of movies
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line107">line 107</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+    <h5>Examples</h5>
+    
+    <pre class="prettyprint"><code>Authentication: Bearer token (JWT)</code></pre>
+
+    <pre class="prettyprint"><code>Request data format{  "UserName": "",  "MovieID": ObjectID}</code></pre>
+
+    <pre class="prettyprint"><code>Response data format{  "FavoriteMovies": [ObjectID]}</code></pre>
+
+
+
+        
+            
+<h4 class="name" id="PUT/users/:Username"><span class="type-signature"></span>PUT /users/:Username<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    Update a user's info, by username
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line229">line 229</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+    <h5>Examples</h5>
+    
+    <pre class="prettyprint"><code>Authentication: Bearer token (JWT)</code></pre>
+
+    <pre class="prettyprint"><code>Request data format{"Username": "","Password": "","Email": "","Birthday": ""}</code></pre>
+
+    <pre class="prettyprint"><code>Response data format{ "_id": ObjectID,"Username": "","Password": "","Email": "","Birthday": "","FavoriteMovies": [ObjectID]}</code></pre>
+
+
+
+        
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#DELETE/users/:Username">DELETE /users/:Username</a></li><li><a href="global.html#DELETE/users/:Username/movies/:MovieID">DELETE /users/:Username/movies/:MovieID</a></li><li><a href="global.html#GET/movies">GET /movies</a></li><li><a href="global.html#GET/movies/:Title">GET /movies/:Title</a></li><li><a href="global.html#GET/movies/director/:Name">GET /movies/director/:Name</a></li><li><a href="global.html#GET/movies/genre/:Name">GET /movies/genre/:Name</a></li><li><a href="global.html#GET/users/:Username">GET /users/:Username</a></li><li><a href="global.html#POST/users/">POST /users/</a></li><li><a href="global.html#POST/users/:UserName/movies/:MovieID">POST /users/:UserName/movies/:MovieID</a></li><li><a href="global.html#PUT/users/:Username">PUT /users/:Username</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Fri Oct 20 2023 17:08:33 GMT+0200 (Central European Summer Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
