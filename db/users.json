@@ -1,6 +1,0 @@
-{"_id":{"$oid":"64ca28e191507885a97e9303"},"Username":"Richard Riddick","Password":"richard.riddick","Email":"pitch@black.com","Birthday":{"$date":"1980-01-01T00:00:00Z"},"FavoriteMovies":[{"$oid":"64c8f104eded7424de4bc0c3"},{"$oid":"64ca10503f76e6686418ca65"}]}
-{"_id":{"$oid":"64ca292191507885a97e9304"},"Username":"Thomas Anderson","Password":"thomas.anderson","Email":"neo@matrix.com","Birthday":{"$date":"1985-01-01T00:00:00Z"},"FavoriteMovies":[{"$oid":"64ca155f3f76e6686418ca66"},{"$oid":"64ca15993f76e6686418ca67"}]}
-{"_id":{"$oid":"64ca296a91507885a97e9306"},"Username":"Geralt Rivia","Password":"geralt.rivia","Email":"indywitcher@monster.com","Birthday":{"$date":{"$numberLong":"-157766400000"}},"FavoriteMovies":[{"$oid":"64ca17063f76e6686418ca6a"},{"$oid":"64ca17883f76e6686418ca6c"}]}
-{"_id":{"$oid":"64ca298691507885a97e9307"},"Username":"Joseph Dredd","Password":"joseph.dredd","Email":"judge.dredd.com","Birthday":{"$date":"1970-01-01T00:00:00Z"},"FavoriteMovies":[{"$oid":"64ca176c3f76e6686418ca6b"},{"$oid":"64ca25be3f76e6686418ca6d"},{"$oid":"64ca155f3f76e6686418ca66"}]}
-{"_id":{"$oid":"64d21673aa415a8e8e7ce2cd"},"Username":"Mark Saville","Password":"new.password","Email":"mark@saville.com","Birthday":{"$date":"1970-01-01T00:00:01.98Z"},"FavoriteMovies":[],"__v":0}
-
