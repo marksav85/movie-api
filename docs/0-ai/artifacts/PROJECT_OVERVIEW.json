@@ -1,0 +1,133 @@
+{
+  "generatedAt": "2026-09-26T22:39:21Z",
+  "rootTree": {
+    "files": [
+      ".gitattributes",
+      ".gitignore",
+      ".gitmodules",
+      "README.md",
+      "auth.js",
+      "index.html",
+      "index.js",
+      "models.js",
+      "package-lock.json",
+      "package.json",
+      "passport.js"
+    ],
+    "folders": [
+      "docs",
+      "out",
+      "playbook",
+      "public",
+      "styles"
+    ]
+  },
+  "public": {
+    "files": [
+      "documentation.html"
+    ],
+    "folders": []
+  },
+  "scripts": {
+    "files": []
+  },
+  "configFiles": [],
+  "frameworkAnalysis": {
+    "nextRouterType": "unknown",
+    "tailwind": null
+  },
+  "packageJson": {
+    "raw": {
+      "name": "movie-api",
+      "version": "1.0.0",
+      "description": "",
+      "main": "index.js",
+      "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "node index.js",
+        "dev": "nodemon server.js"
+      },
+      "keywords": [],
+      "author": "",
+      "license": "ISC",
+      "dependencies": {
+        "bcrypt": "^5.1.0",
+        "body-parser": "^1.20.2",
+        "cors": "^2.8.5",
+        "express": "^4.18.2",
+        "express-validator": "^7.0.1",
+        "jsonwebtoken": "^9.0.1",
+        "lodash": "^4.17.21",
+        "mongoose": "^7.4.1",
+        "morgan": "^1.10.0",
+        "passport": "^0.6.0",
+        "passport-jwt": "^4.0.1",
+        "passport-local": "^1.0.0",
+        "uuid": "^9.0.0"
+      },
+      "devDependencies": {
+        "eslint": "^8.45.0",
+        "nodemon": "^3.0.1"
+      }
+    },
+    "summary": {
+      "name": "movie-api",
+      "version": "1.0.0",
+      "private": null,
+      "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "node index.js",
+        "dev": "nodemon server.js"
+      },
+      "dependencies": {
+        "bcrypt": "^5.1.0",
+        "body-parser": "^1.20.2",
+        "cors": "^2.8.5",
+        "express": "^4.18.2",
+        "express-validator": "^7.0.1",
+        "jsonwebtoken": "^9.0.1",
+        "lodash": "^4.17.21",
+        "mongoose": "^7.4.1",
+        "morgan": "^1.10.0",
+        "passport": "^0.6.0",
+        "passport-jwt": "^4.0.1",
+        "passport-local": "^1.0.0",
+        "uuid": "^9.0.0"
+      },
+      "devDependencies": {
+        "eslint": "^8.45.0",
+        "nodemon": "^3.0.1"
+      }
+    },
+    "categorizedDependencies": {
+      "framework": [
+        "express"
+      ],
+      "styling": [],
+      "typeSystem": [],
+      "lintingFormatting": [
+        "eslint"
+      ],
+      "buildTools": [
+        "nodemon"
+      ],
+      "deployment": [],
+      "dataContent": [
+        "mongoose"
+      ],
+      "utilities": [
+        "bcrypt",
+        "body-parser",
+        "cors",
+        "express-validator",
+        "jsonwebtoken",
+        "lodash",
+        "morgan",
+        "passport",
+        "passport-jwt",
+        "passport-local",
+        "uuid"
+      ]
+    }
+  }
+}

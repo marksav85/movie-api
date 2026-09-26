@@ -1,0 +1,99 @@
+{
+  "packId": "2026-09-26T22:39:21Z",
+  "runMode": "controller",
+  "generatedAt": "2026-09-26T22:39:21Z",
+  "verifiedAt": "2026-09-26T22:39:21Z",
+  "repoBranch": "refactor/portfolio-update",
+  "repoHead": "ece0ae9c1475593d6bce0de853452e523e9fe2e1",
+  "scopeHeads": {
+    "docsHead": null,
+    "srcHead": null,
+    "depsHead": "6bdfb1ed88611060d5b9280381c9954f08e625de"
+  },
+  "dirtyWorkingTree": false,
+  "stalenessSummary": {
+    "counts": {
+      "flagged": 6,
+      "regenerated": 6,
+      "acknowledged": 0,
+      "verified": 0
+    },
+    "scopeChanges": {
+      "docs": false,
+      "src": false,
+      "deps": false
+    },
+    "warnings": [
+      "No prior manifest existed; initial-pack freshness was unknown.",
+      "The repository has no docs/ or src/ Git scope at the captured HEAD.",
+      "Runtime source uses a legacy root-level JavaScript layout; SRC_TREE and the snapshot record that layout instead of an absent src/ directory."
+    ]
+  },
+  "artifacts": [
+    {
+      "artifactId": "SRC_TREE",
+      "path": "docs/0-ai/artifacts/SRC_TREE.json",
+      "generatedAt": "2026-09-26T22:39:21Z",
+      "verifiedAt": "2026-09-26T22:39:21Z",
+      "status": "regenerated",
+      "sizeBytes": 1034,
+      "contentHash": "32f477b6b067674d01d1639904080384e5c586113fdbd3851cea0fd279263ada",
+      "dependsOnScopes": ["src"],
+      "scopeHeadsAtVerify": { "srcHead": null }
+    },
+    {
+      "artifactId": "SRC_SNAPSHOT_1",
+      "path": "docs/0-ai/artifacts/SRC_SNAPSHOT_1.tsx",
+      "generatedAt": "2026-09-26T22:39:21Z",
+      "verifiedAt": "2026-09-26T22:39:21Z",
+      "status": "regenerated",
+      "sizeBytes": 15622,
+      "contentHash": "4b8e6356806bb73be4498fb4b667d415e1ba6dd9a4211eef976417580169d66d",
+      "dependsOnScopes": ["src"],
+      "scopeHeadsAtVerify": { "srcHead": null }
+    },
+    {
+      "artifactId": "CONTEXT_SUMMARY",
+      "path": "docs/0-ai/artifacts/CONTEXT_SUMMARY.md",
+      "generatedAt": "2026-09-26T22:39:21Z",
+      "verifiedAt": "2026-09-26T22:39:21Z",
+      "status": "regenerated",
+      "sizeBytes": 2812,
+      "contentHash": "efaab940e17508f1a7097394ed4ba9fb94452405d01b554be47d5671ad98089c",
+      "dependsOnScopes": ["src"],
+      "scopeHeadsAtVerify": { "srcHead": null }
+    },
+    {
+      "artifactId": "PROJECT_OVERVIEW",
+      "path": "docs/0-ai/artifacts/PROJECT_OVERVIEW.json",
+      "generatedAt": "2026-09-26T22:39:21Z",
+      "verifiedAt": "2026-09-26T22:39:21Z",
+      "status": "regenerated",
+      "sizeBytes": 2905,
+      "contentHash": "54b41466e46af3f6b2305975fe23bc34672c17a5d517ac012300c8a4f3342603",
+      "dependsOnScopes": ["docs", "deps"],
+      "scopeHeadsAtVerify": { "docsHead": null, "depsHead": "6bdfb1ed88611060d5b9280381c9954f08e625de" }
+    },
+    {
+      "artifactId": "DOCS_TREE",
+      "path": "docs/0-ai/artifacts/DOCS_TREE.json",
+      "generatedAt": "2026-09-26T22:39:21Z",
+      "verifiedAt": "2026-09-26T22:39:21Z",
+      "status": "regenerated",
+      "sizeBytes": 2669,
+      "contentHash": "eb3426a0c43d310583cefe01b6d66e960e4068649411aaaab14e858b228f06b0",
+      "dependsOnScopes": ["docs"],
+      "scopeHeadsAtVerify": { "docsHead": null }
+    },
+    {
+      "artifactId": "ARTIFACT_PACK_MANIFEST",
+      "path": "docs/0-ai/artifacts/ARTIFACT_PACK_MANIFEST.json",
+      "generatedAt": "2026-09-26T22:39:21Z",
+      "verifiedAt": "2026-09-26T22:39:21Z",
+      "status": "regenerated",
+      "dependsOnScopes": ["docs", "src", "deps"],
+      "scopeHeadsAtVerify": { "docsHead": null, "srcHead": null, "depsHead": "6bdfb1ed88611060d5b9280381c9954f08e625de" },
+      "warnings": ["Self-referential hash and size omitted by controller contract."]
+    }
+  ]
+}

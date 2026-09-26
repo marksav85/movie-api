@@ -1,0 +1,89 @@
+{
+  "generatedAt": "2026-09-26T22:39:21Z",
+  "root": "docs",
+  "summary": {
+    "totalFiles": 6,
+    "totalDirectories": 3,
+    "byExtension": {
+      ".json": 4,
+      ".md": 1,
+      ".tsx": 1
+    }
+  },
+  "tree": [
+    {
+      "type": "directory",
+      "name": "0-ai",
+      "relativePath": "docs/0-ai",
+      "children": [
+        {
+          "type": "directory",
+          "name": "artifacts",
+          "relativePath": "docs/0-ai/artifacts",
+          "children": [
+            {
+              "type": "file",
+              "name": "CONTEXT_SUMMARY.md",
+              "relativePath": "docs/0-ai/artifacts/CONTEXT_SUMMARY.md",
+              "extension": ".md",
+              "sizeKB": 2.7,
+              "tier": "core",
+              "riskIfMissing": "medium",
+              "tags": ["artifacts", "context"]
+            },
+            {
+              "type": "file",
+              "name": "DOCS_TREE.json",
+              "relativePath": "docs/0-ai/artifacts/DOCS_TREE.json",
+              "extension": ".json",
+              "sizeKB": 2.7,
+              "tier": "core",
+              "riskIfMissing": "medium",
+              "tags": ["artifacts", "structure"]
+            },
+            {
+              "type": "file",
+              "name": "ARTIFACT_PACK_MANIFEST.json",
+              "relativePath": "docs/0-ai/artifacts/ARTIFACT_PACK_MANIFEST.json",
+              "extension": ".json",
+              "sizeKB": 3.6,
+              "tier": "core",
+              "riskIfMissing": "medium",
+              "tags": ["artifacts", "status"]
+            },
+            {
+              "type": "file",
+              "name": "PROJECT_OVERVIEW.json",
+              "relativePath": "docs/0-ai/artifacts/PROJECT_OVERVIEW.json",
+              "extension": ".json",
+              "sizeKB": 2.8,
+              "tier": "core",
+              "riskIfMissing": "medium",
+              "tags": ["artifacts", "context"]
+            },
+            {
+              "type": "file",
+              "name": "SRC_SNAPSHOT_1.tsx",
+              "relativePath": "docs/0-ai/artifacts/SRC_SNAPSHOT_1.tsx",
+              "extension": ".tsx",
+              "sizeKB": 15.3,
+              "tier": "core",
+              "riskIfMissing": "medium",
+              "tags": ["artifacts", "context"]
+            },
+            {
+              "type": "file",
+              "name": "SRC_TREE.json",
+              "relativePath": "docs/0-ai/artifacts/SRC_TREE.json",
+              "extension": ".json",
+              "sizeKB": 1.0,
+              "tier": "core",
+              "riskIfMissing": "medium",
+              "tags": ["artifacts", "structure"]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

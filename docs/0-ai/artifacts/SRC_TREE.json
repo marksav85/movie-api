@@ -1,0 +1,54 @@
+{
+  "generatedAt": "2026-09-26T22:39:21Z",
+  "root": ".",
+  "summary": {
+    "totalFiles": 4,
+    "totalDirectories": 0
+  },
+  "tree": [
+    {
+      "type": "file",
+      "name": "auth.js",
+      "relativePath": "auth.js",
+      "extension": ".js",
+      "sizeKB": 1.8,
+      "isComponent": false,
+      "imports": [
+        "passport.js"
+      ]
+    },
+    {
+      "type": "file",
+      "name": "index.js",
+      "relativePath": "index.js",
+      "extension": ".js",
+      "sizeKB": 14.5,
+      "isComponent": false,
+      "imports": [
+        "models.js",
+        "passport.js",
+        "auth.js"
+      ]
+    },
+    {
+      "type": "file",
+      "name": "models.js",
+      "relativePath": "models.js",
+      "extension": ".js",
+      "sizeKB": 1.2,
+      "isComponent": false,
+      "imports": []
+    },
+    {
+      "type": "file",
+      "name": "passport.js",
+      "relativePath": "passport.js",
+      "extension": ".js",
+      "sizeKB": 1.7,
+      "isComponent": false,
+      "imports": [
+        "models.js"
+      ]
+    }
+  ]
+}
