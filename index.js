@@ -2,7 +2,6 @@ const express = require("express");
 const { MemoryStore, rateLimit } = require("express-rate-limit");
 const helmet = require("helmet");
 const morgan = require("morgan");
-const uuid = require("uuid");
 const mongoose = require("mongoose");
 const { check, validationResult } = require("express-validator");
 const cors = require("cors");
@@ -590,10 +589,7 @@ app.use((err, req, res, next) => {
 // configured app lets the contract test suite exercise the same routes without
 // opening a listener or connecting to a non-test database at module load time.
 if (require.main === module) {
-  mongoose.connect(process.env.CONNECTION_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
+  mongoose.connect(process.env.CONNECTION_URI);
 
   const port = process.env.PORT || 8080;
   app.listen(port, "0.0.0.0", () => {
