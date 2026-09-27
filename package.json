@@ -3,10 +3,16 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "engines": {
+    "node": ">=22 <25"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node --test tests/*.test.js",
+    "test:watch": "node --test --watch tests/*.test.js",
     "start": "node index.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon index.js",
+    "lint": "eslint .",
+    "check": "node --check index.js && node --check auth.js && node --check passport.js && node --check models.js"
   },
   "keywords": [],
   "author": "",
@@ -28,6 +34,8 @@
   },
   "devDependencies": {
     "eslint": "^8.45.0",
-    "nodemon": "^3.0.1"
+    "mongodb-memory-server": "^11.3.0",
+    "nodemon": "^3.0.1",
+    "supertest": "^7.3.0"
   }
 }

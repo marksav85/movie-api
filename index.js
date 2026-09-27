@@ -11,12 +11,6 @@ const app = express();
 const Movies = Models.Movie;
 const Users = Models.User;
 
-// Connect to MongoDB
-mongoose.connect(process.env.CONNECTION_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
-
 // Middleware
 app.use(morgan("common"));
 app.use(express.json());
@@ -501,8 +495,19 @@ app.use((err, req, res, next) => {
   res.status(500).send("Something broke!");
 });
 
-// Listen for requests
-const port = process.env.PORT || 8080;
-app.listen(port, "0.0.0.0", () => {
-  console.log("Listening on Port " + port);
-});
+// Start the HTTP server only when this file is executed directly. Exporting the
+// configured app lets the contract test suite exercise the same routes without
+// opening a listener or connecting to a non-test database at module load time.
+if (require.main === module) {
+  mongoose.connect(process.env.CONNECTION_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
+
+  const port = process.env.PORT || 8080;
+  app.listen(port, "0.0.0.0", () => {
+    console.log("Listening on Port " + port);
+  });
+}
+
+module.exports = app;
