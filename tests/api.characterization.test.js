@@ -1,6 +1,7 @@
 const { after, afterEach, before, test } = require("node:test");
 const assert = require("node:assert/strict");
-const { spawnSync } = require("node:child_process");
+const { spawn, spawnSync } = require("node:child_process");
+const { once } = require("node:events");
 const path = require("node:path");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
@@ -34,6 +35,13 @@ const authHeaderFor = (user) => ({
     expiresIn: "7d",
     subject: user.Username,
   })}`,
+});
+
+const startupEnvironment = (overrides = {}) => ({
+  ...process.env,
+  CONNECTION_URI: mongoServer.getUri(),
+  PORT: "0",
+  ...overrides,
 });
 
 before(async () => {
@@ -121,6 +129,54 @@ test("production configuration requires explicit CORS origins", () => {
 
   assert.notEqual(result.status, 0);
   assert.match(result.stderr, /CORS_ALLOWED_ORIGINS must be configured/);
+});
+
+test("bootstrap does not listen when MongoDB connection setup fails", () => {
+  const result = spawnSync(process.execPath, ["index.js"], {
+    cwd: path.resolve(__dirname, ".."),
+    env: startupEnvironment({ CONNECTION_URI: "not-a-mongodb-uri" }),
+    encoding: "utf8",
+  });
+
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /Database connection failed\. The server was not started\./);
+  assert.equal(result.stdout.includes("Listening on Port"), false);
+  assert.equal(result.stderr.includes("not-a-mongodb-uri"), false);
+});
+
+test("bootstrap listens only after connecting and shuts down on SIGTERM", async () => {
+  const child = spawn(process.execPath, ["index.js"], {
+    cwd: path.resolve(__dirname, ".."),
+    env: startupEnvironment(),
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+  let stdout = "";
+  let stderr = "";
+  child.stdout.on("data", (chunk) => {
+    stdout += chunk;
+  });
+  child.stderr.on("data", (chunk) => {
+    stderr += chunk;
+  });
+
+  try {
+    await Promise.race([
+      once(child.stdout, "data"),
+      once(child, "error").then(([error]) => Promise.reject(error)),
+      new Promise((_, reject) => setTimeout(() => reject(new Error("Server did not start")), 10000)),
+    ]);
+    assert.match(stdout, /Listening on Port 0/);
+    child.kill("SIGTERM");
+    const [exitCode, signal] = await once(child, "exit");
+    assert.equal(signal, null);
+    assert.equal(exitCode, 0);
+    assert.match(stdout, /Shutdown complete\./);
+    assert.equal(stderr, "");
+  } finally {
+    if (!child.killed) {
+      child.kill("SIGKILL");
+    }
+  }
 });
 
 test("POST /users retains registration validation and omits Password from its response", async () => {
@@ -287,13 +343,12 @@ test("missing movie and user detail resources return 404", async () => {
   assert.deepEqual(missingUser.body, { message: "User not found" });
 });
 
-test("GET /users retains broad authenticated access without exposing Password", async () => {
+test("GET /users is retired and no longer returns the user collection", async () => {
   const headers = authHeaderFor(primaryUser);
-  const allUsers = await request(app).get("/users").set(headers);
+  const response = await request(app).get("/users").set(headers);
 
-  assert.equal(allUsers.status, 200);
-  assert.ok(allUsers.body.some((user) => user.Username === secondaryUser.Username));
-  assert.ok(allUsers.body.every((user) => !Object.hasOwn(user, "Password")));
+  assert.equal(response.status, 404);
+  assert.equal(Array.isArray(response.body), false);
 });
 
 test("GET /users/:Username permits self access and rejects another user", async () => {

@@ -12,7 +12,7 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "lint": "eslint .",
-    "check": "node --check index.js && node --check auth.js && node --check passport.js && node --check models.js && node --check config.js"
+    "check": "node --check index.js && node --check app.js && node --check config.js && node --check models.js && node --check passport.js && node --check middleware/authorization.js && node --check middleware/errors.js && node --check middleware/resources.js && node --check middleware/validation.js && node --check routes/auth.js && node --check routes/movies.js && node --check routes/users.js"
   },
   "keywords": [],
   "author": "",
