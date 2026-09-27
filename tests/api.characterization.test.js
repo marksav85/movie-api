@@ -170,28 +170,39 @@ test("movie retrieval routes preserve fields and successful response shapes", as
   assert.equal(byDirector.body[0].Director.Name, "Fixture Director");
 });
 
-test("missing single resources currently return 200 with a null JSON body", async () => {
+test("missing movie and user detail resources return 404", async () => {
   const headers = authHeaderFor(primaryUser);
   const missingMovie = await request(app).get("/movies/No%20such%20movie").set(headers);
   const missingUser = await request(app).get("/users/no-such-user").set(headers);
 
-  assert.equal(missingMovie.status, 200);
-  assert.equal(missingMovie.body, null);
-  assert.equal(missingUser.status, 200);
-  assert.equal(missingUser.body, null);
+  assert.equal(missingMovie.status, 404);
+  assert.deepEqual(missingMovie.body, { message: "Movie not found" });
+  assert.equal(missingUser.status, 404);
+  assert.deepEqual(missingUser.body, { message: "User not found" });
 });
 
-test("GET /users and GET /users/:Username retain broad legacy access without exposing Password", async () => {
+test("GET /users retains broad authenticated access without exposing Password", async () => {
   const headers = authHeaderFor(primaryUser);
   const allUsers = await request(app).get("/users").set(headers);
-  const otherUser = await request(app).get(`/users/${secondaryUser.Username}`).set(headers);
 
   assert.equal(allUsers.status, 200);
   assert.ok(allUsers.body.some((user) => user.Username === secondaryUser.Username));
   assert.ok(allUsers.body.every((user) => !Object.hasOwn(user, "Password")));
-  assert.equal(otherUser.status, 200);
-  assert.equal(otherUser.body.Username, secondaryUser.Username);
-  assert.equal(Object.hasOwn(otherUser.body, "Password"), false);
+});
+
+test("GET /users/:Username permits self access and rejects another user", async () => {
+  const ownUser = await request(app)
+    .get(`/users/${primaryUser.Username}`)
+    .set(authHeaderFor(primaryUser));
+  const otherUser = await request(app)
+    .get(`/users/${secondaryUser.Username}`)
+    .set(authHeaderFor(primaryUser));
+
+  assert.equal(ownUser.status, 200);
+  assert.equal(ownUser.body.Username, primaryUser.Username);
+  assert.equal(Object.hasOwn(ownUser.body, "Password"), false);
+  assert.equal(otherUser.status, 403);
+  assert.deepEqual(otherUser.body, { message: "Forbidden" });
 });
 
 test("PUT /users/:Username hashes replacement passwords, omits Password, and permits login with the new password", async () => {
@@ -218,7 +229,7 @@ test("PUT /users/:Username hashes replacement passwords, omits Password, and per
   assert.equal(loginResponse.status, 200);
 });
 
-test("PUT /users/:Username rejects an authenticated cross-user update with the legacy response", async () => {
+test("PUT /users/:Username rejects an authenticated cross-user update", async () => {
   const response = await request(app)
     .put(`/users/${secondaryUser.Username}`)
     .set(authHeaderFor(primaryUser))
@@ -228,48 +239,86 @@ test("PUT /users/:Username rejects an authenticated cross-user update with the l
       Email: secondaryUser.Email,
     });
 
-  assert.equal(response.status, 400);
-  assert.equal(response.text, "Permission denied");
+  assert.equal(response.status, 403);
+  assert.deepEqual(response.body, { message: "Forbidden" });
 });
 
-test("favourite mutations allow cross-user writes and duplicate movie references", async () => {
+test("favourite addition is idempotent for the authenticated user", async () => {
   const headers = authHeaderFor(primaryUser);
   const first = await request(app)
-    .post(`/users/${secondaryUser.Username}/movies/${movie.id}`)
+    .post(`/users/${primaryUser.Username}/movies/${movie.id}`)
     .set(headers);
   const second = await request(app)
-    .post(`/users/${secondaryUser.Username}/movies/${movie.id}`)
+    .post(`/users/${primaryUser.Username}/movies/${movie.id}`)
     .set(headers);
 
   assert.equal(first.status, 200);
   assert.equal(second.status, 200);
-  assert.equal(second.body.Username, secondaryUser.Username);
-  assert.equal(second.body.FavoriteMovies.length, 2);
+  assert.equal(second.body.Username, primaryUser.Username);
+  assert.equal(second.body.FavoriteMovies.length, 1);
   assert.equal(Object.hasOwn(second.body, "Password"), false);
 });
 
-test("DELETE /users/:Username/movies/:MovieID permits a cross-user favourite removal", async () => {
+test("favourite removal succeeds for the authenticated user", async () => {
   const response = await request(app)
-    .delete(`/users/${secondaryUser.Username}/movies/${movie.id}`)
+    .delete(`/users/${primaryUser.Username}/movies/${movie.id}`)
     .set(authHeaderFor(primaryUser));
 
   assert.equal(response.status, 200);
-  assert.equal(response.body.Username, secondaryUser.Username);
+  assert.equal(response.body.Username, primaryUser.Username);
   assert.deepEqual(response.body.FavoriteMovies, []);
   assert.equal(Object.hasOwn(response.body, "Password"), false);
 });
 
-test("DELETE /users/:Username permits cross-user deletion and preserves its legacy response", async () => {
+test("favourite routes reject cross-user changes and validate MovieID resources", async () => {
+  const headers = authHeaderFor(primaryUser);
+  const crossUserAdd = await request(app)
+    .post(`/users/${secondaryUser.Username}/movies/${movie.id}`)
+    .set(headers);
+  const crossUserDelete = await request(app)
+    .delete(`/users/${secondaryUser.Username}/movies/${movie.id}`)
+    .set(headers);
+  const missingMovie = await request(app)
+    .post(`/users/${primaryUser.Username}/movies/${new mongoose.Types.ObjectId()}`)
+    .set(headers);
+  const malformedMovie = await request(app)
+    .post(`/users/${primaryUser.Username}/movies/not-a-mongo-id`)
+    .set(headers);
+  const missingUser = await request(app)
+    .post(`/users/no-such-user/movies/${movie.id}`)
+    .set(headers);
+
+  assert.equal(crossUserAdd.status, 403);
+  assert.deepEqual(crossUserAdd.body, { message: "Forbidden" });
+  assert.equal(crossUserDelete.status, 403);
+  assert.deepEqual(crossUserDelete.body, { message: "Forbidden" });
+  assert.equal(missingMovie.status, 404);
+  assert.deepEqual(missingMovie.body, { message: "Movie not found" });
+  assert.equal(malformedMovie.status, 400);
+  assert.deepEqual(malformedMovie.body, {
+    message: "MovieID must be a valid MongoDB ObjectId",
+  });
+  assert.equal(missingUser.status, 404);
+  assert.deepEqual(missingUser.body, { message: "User not found" });
+});
+
+test("DELETE /users/:Username rejects cross-user deletion and permits self deletion", async () => {
   const deletableUser = await Users.create({
     Username: "deletable-user",
     Password: Users.hashPassword("deletable-password"),
     Email: "deletable@example.test",
   });
-  const response = await request(app)
-    .delete(`/users/${deletableUser.Username}`)
+  const crossUserResponse = await request(app)
+    .delete(`/users/${secondaryUser.Username}`)
     .set(authHeaderFor(primaryUser));
+  const selfResponse = await request(app)
+    .delete(`/users/${deletableUser.Username}`)
+    .set(authHeaderFor(deletableUser));
 
-  assert.equal(response.status, 200);
-  assert.equal(response.text, `${deletableUser.Username} was deleted.`);
+  assert.equal(crossUserResponse.status, 403);
+  assert.deepEqual(crossUserResponse.body, { message: "Forbidden" });
+  assert.notEqual(await Users.findById(secondaryUser.id), null);
+  assert.equal(selfResponse.status, 200);
+  assert.equal(selfResponse.text, `${deletableUser.Username} was deleted.`);
   assert.equal(await Users.findById(deletableUser.id), null);
 });

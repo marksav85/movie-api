@@ -11,6 +11,45 @@ const app = express();
 const Movies = Models.Movie;
 const Users = Models.User;
 
+const loadRequestedUser = async (req, res, next) => {
+  try {
+    const user = await Users.findOne({ Username: req.params.Username });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    req.requestedUser = user;
+    return next();
+  } catch (error) {
+    return next(error);
+  }
+};
+
+const requireSelf = (req, res, next) => {
+  if (req.user.Username !== req.params.Username) {
+    return res.status(403).json({ message: "Forbidden" });
+  }
+
+  return next();
+};
+
+const validateFavoriteMovie = async (req, res, next) => {
+  if (!mongoose.isObjectIdOrHexString(req.params.MovieID)) {
+    return res.status(400).json({ message: "MovieID must be a valid MongoDB ObjectId" });
+  }
+
+  try {
+    const movieExists = await Movies.exists({ _id: req.params.MovieID });
+    if (!movieExists) {
+      return res.status(404).json({ message: "Movie not found" });
+    }
+
+    return next();
+  } catch (error) {
+    return next(error);
+  }
+};
+
 // Middleware
 app.use(morgan("common"));
 app.use(express.json());
@@ -105,17 +144,19 @@ app.post(
 app.post(
   "/users/:Username/movies/:MovieID",
   passport.authenticate("jwt", { session: false }),
-  async (req, res) => {
+  loadRequestedUser,
+  requireSelf,
+  validateFavoriteMovie,
+  async (req, res, next) => {
     try {
-      const updatedUser = await Users.findOneAndUpdate(
-        { Username: req.params.Username },
-        { $push: { FavoriteMovies: req.params.MovieID } },
+      const updatedUser = await Users.findByIdAndUpdate(
+        req.requestedUser._id,
+        { $addToSet: { FavoriteMovies: req.params.MovieID } },
         { new: true }
       );
       res.json(updatedUser);
     } catch (error) {
-      console.error(error);
-      res.status(500).send("Error: " + error);
+      next(error);
     }
   }
 );
@@ -137,19 +178,14 @@ app.post(
 app.delete(
   "/users/:Username",
   passport.authenticate("jwt", { session: false }),
-  async (req, res) => {
+  loadRequestedUser,
+  requireSelf,
+  async (req, res, next) => {
     try {
-      const user = await Users.findOneAndRemove({
-        Username: req.params.Username,
-      });
-      if (!user) {
-        res.status(400).send(req.params.Username + " was not found");
-      } else {
-        res.status(200).send(req.params.Username + " was deleted.");
-      }
+      await Users.findByIdAndDelete(req.requestedUser._id);
+      res.status(200).send(req.params.Username + " was deleted.");
     } catch (error) {
-      console.error(error);
-      res.status(500).send("Error: " + error);
+      next(error);
     }
   }
 );
@@ -174,17 +210,19 @@ app.delete(
 app.delete(
   "/users/:Username/movies/:MovieID",
   passport.authenticate("jwt", { session: false }),
-  async (req, res) => {
+  loadRequestedUser,
+  requireSelf,
+  validateFavoriteMovie,
+  async (req, res, next) => {
     try {
-      const updatedUser = await Users.findOneAndUpdate(
-        { Username: req.params.Username },
+      const updatedUser = await Users.findByIdAndUpdate(
+        req.requestedUser._id,
         { $pull: { FavoriteMovies: req.params.MovieID } },
         { new: true }
       );
       res.json(updatedUser);
     } catch (error) {
-      console.error(error);
-      res.status(500).send("Error: " + error);
+      next(error);
     }
   }
 );
@@ -216,15 +254,12 @@ app.delete(
 app.put(
   "/users/:Username",
   passport.authenticate("jwt", { session: false }),
-  async (req, res) => {
-    // Check for permission
-    if (req.user.Username !== req.params.Username) {
-      return res.status(400).send("Permission denied");
-    }
-
+  loadRequestedUser,
+  requireSelf,
+  async (req, res, next) => {
     try {
-      const updatedUser = await Users.findOneAndUpdate(
-        { Username: req.params.Username },
+      const updatedUser = await Users.findByIdAndUpdate(
+        req.requestedUser._id,
         {
           $set: {
             Username: req.body.Username,
@@ -237,8 +272,7 @@ app.put(
       );
       res.status(201).json(updatedUser);
     } catch (error) {
-      console.error(error);
-      res.status(500).send("Error: " + error);
+      next(error);
     }
   }
 );
@@ -303,14 +337,10 @@ app.get(
 app.get(
   "/users/:Username",
   passport.authenticate("jwt", { session: false }),
+  loadRequestedUser,
+  requireSelf,
   async (req, res) => {
-    try {
-      const user = await Users.findOne({ Username: req.params.Username });
-      res.json(user);
-    } catch (error) {
-      console.error(error);
-      res.status(500).send("Error: " + error);
-    }
+    res.json(req.requestedUser);
   }
 );
 
@@ -378,6 +408,9 @@ app.get(
   async (req, res) => {
     try {
       const movie = await Movies.findOne({ Title: req.params.Title });
+      if (!movie) {
+        return res.status(404).json({ message: "Movie not found" });
+      }
       res.json(movie);
     } catch (error) {
       console.error(error);
