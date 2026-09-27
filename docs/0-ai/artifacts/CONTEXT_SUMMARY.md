@@ -1,7 +1,7 @@
 ---
 artifactId: CONTEXT_SUMMARY
-packId: "2026-09-26T22:39:21Z"
-generatedAt: "2026-09-26T22:39:21Z"
+packId: "2026-09-27T13:56:15Z"
+generatedAt: "2026-09-27T13:56:15Z"
 generator: "prompt--artifact--generate-context-summary.md"
 ---
 
@@ -9,30 +9,24 @@ generator: "prompt--artifact--generate-context-summary.md"
 
 ## Project Type
 
-Legacy CommonJS Node.js Express REST API for the myFlix React and Angular clients. The application serves JSON movie and user data from MongoDB through Mongoose and also serves static content from `public/`.
+CommonJS Node.js Express REST API for the myFlix React and Angular clients. It serves movie and user data from MongoDB through Mongoose and exposes a local API only.
 
 ## Routing Model
 
-No framework router or `src/` directory is present. `index.js` creates the Express app, registers all routes, attaches authentication, and starts the HTTP listener. `auth.js` registers `POST /login`; `passport.js` registers local and JWT Passport strategies; `models.js` defines Mongoose models.
+There is no frontend framework router or `src/` directory. The runtime source uses a root-level Express layout: `app.js` composes middleware and routers, while `index.js` connects to MongoDB and starts or gracefully shuts down the process. The artifact source scope records this equivalent root-level layout.
 
 ## Source Scope
 
-The runtime source root is the repository root, not `src/`. The source-tree artifact therefore records four root-level JavaScript files and no source directories. This is a legacy-layout deviation from the Playbook's `src/`-oriented generator convention.
+The runtime source contains 12 JavaScript files across the repository root, `routes/`, and `middleware/`. Tests live separately in `tests/` and are excluded from the source snapshot.
 
-## Runtime and Configuration
+## HTTP API and authorization
 
-`npm start` runs `node index.js`. The listener binds `0.0.0.0` and uses `PORT` with a fallback of `8080`. MongoDB is configured with the required `CONNECTION_URI` environment-variable name. No committed environment template, Render configuration, Docker configuration, or health-specific endpoint was found. The README and static documentation still describe Heroku rather than Render.
+Public routes are `GET /`, `POST /login`, and `POST /users`. JWT Bearer authentication protects movie reads and all user operations. Movie reads are `GET /movies`, `GET /movies/:Title`, `GET /movies/genre/:Name`, and `GET /movies/director/:Name`. User routes are self-only: `GET`, `PUT`, and `DELETE /users/:Username`, plus `POST` and `DELETE /users/:Username/movies/:MovieID`. `GET /users` is retired.
 
-## HTTP API
+## Data and security
 
-Public endpoints are `GET /`, `POST /login`, and `POST /users`. JWT Bearer authentication is required by the implemented `/movies` and `/users` read/write routes. Implemented paths use case-sensitive parameter names `:Username`, `:MovieID`, `:Title`, and `:Name`.
+Movies embed `Genre` and `Director` objects; user favourites reference Movie ObjectIds. User serialization removes password hashes, passwords are bcrypt-hashed on writes, favourites use `$addToSet` for idempotent addition, and favourite IDs and resources are validated. Helmet, configured CORS, request-body limits, login/API rate limits, and centralized safe errors protect requests.
 
-Movie reads are `GET /movies`, `GET /movies/:Title`, `GET /movies/genre/:Name`, and `GET /movies/director/:Name`. User operations are `GET /users`, `GET /users/:Username`, `PUT /users/:Username`, `DELETE /users/:Username`, `POST /users/:Username/movies/:MovieID`, and `DELETE /users/:Username/movies/:MovieID`.
+## Runtime and quality
 
-## Data Model
-
-`Movie` stores `Title`, `Description`, embedded `Genre` (`Name`, `Description`), embedded `Director` (`Name`, `Bio`), `ImagePath`, and `Featured`. `User` stores `Username`, bcrypt password hash, `Email`, optional `Birthday`, and `FavoriteMovies` ObjectId references to `Movie`.
-
-## Architecture and Quality Baseline
-
-Middleware is Morgan common logging, JSON parsing, URL-encoded parsing, static public-file serving, and unrestricted CORS. Express-validator validates registration only. Error handling is per-route try/catch plus a final generic error handler. There are no implemented automated tests; the configured test script exits with an error. Checked-in `out/` HTML is generated JSDoc output and `public/documentation.html` is supporting documentation, not a verified runtime contract.
+Configuration validates a required JWT secret, CORS origins, body-size limits, and rate-limit settings. `CONNECTION_URI` is required at server startup; MongoDB connects before listening. SIGINT and SIGTERM trigger listener and database shutdown. Node 24 is the declared target and Node `>=22 <25` is supported. The 23 integration and process tests use MongoDB Memory Server rather than production data. ESLint 10 uses flat config.

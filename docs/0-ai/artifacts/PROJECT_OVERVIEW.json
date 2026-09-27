@@ -1,12 +1,16 @@
 {
-  "generatedAt": "2026-09-26T22:39:21Z",
+  "generatedAt": "2026-09-27T13:56:15Z",
   "rootTree": {
     "files": [
+      ".env.example",
       ".gitattributes",
       ".gitignore",
       ".gitmodules",
+      ".nvmrc",
       "README.md",
-      "auth.js",
+      "app.js",
+      "config.js",
+      "eslint.config.cjs",
       "index.html",
       "index.js",
       "models.js",
@@ -16,22 +20,27 @@
     ],
     "folders": [
       "docs",
+      "middleware",
       "out",
       "playbook",
       "public",
-      "styles"
+      "routes",
+      "styles",
+      "tests"
     ]
   },
   "public": {
-    "files": [
-      "documentation.html"
-    ],
+    "files": [],
     "folders": []
   },
   "scripts": {
     "files": []
   },
-  "configFiles": [],
+  "configFiles": [
+    ".env.example",
+    ".nvmrc",
+    "eslint.config.cjs"
+  ],
   "frameworkAnalysis": {
     "nextRouterType": "unknown",
     "tailwind": null
@@ -42,32 +51,41 @@
       "version": "1.0.0",
       "description": "",
       "main": "index.js",
+      "engines": {
+        "node": ">=22 <25"
+      },
       "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
+        "test": "node --test tests/*.test.js",
+        "test:watch": "node --test --watch tests/*.test.js",
         "start": "node index.js",
-        "dev": "nodemon server.js"
+        "dev": "nodemon index.js",
+        "lint": "eslint .",
+        "check": "node --check index.js && node --check app.js && node --check config.js && node --check models.js && node --check passport.js && node --check middleware/authorization.js && node --check middleware/errors.js && node --check middleware/resources.js && node --check middleware/validation.js && node --check routes/auth.js && node --check routes/movies.js && node --check routes/users.js"
       },
       "keywords": [],
       "author": "",
       "license": "ISC",
       "dependencies": {
-        "bcrypt": "^5.1.0",
-        "body-parser": "^1.20.2",
+        "bcrypt": "^6.0.0",
         "cors": "^2.8.5",
-        "express": "^4.18.2",
-        "express-validator": "^7.0.1",
-        "jsonwebtoken": "^9.0.1",
-        "lodash": "^4.17.21",
-        "mongoose": "^7.4.1",
-        "morgan": "^1.10.0",
+        "express": "^5.2.1",
+        "express-rate-limit": "^8.7.0",
+        "express-validator": "^7.3.2",
+        "helmet": "^8.3.0",
+        "jsonwebtoken": "^9.0.3",
+        "mongoose": "^8.24.4",
+        "morgan": "^1.12.1",
         "passport": "^0.6.0",
         "passport-jwt": "^4.0.1",
-        "passport-local": "^1.0.0",
-        "uuid": "^9.0.0"
+        "passport-local": "^1.0.0"
       },
       "devDependencies": {
-        "eslint": "^8.45.0",
-        "nodemon": "^3.0.1"
+        "@eslint/js": "^10.0.1",
+        "eslint": "^10.11.0",
+        "globals": "^17.12.0",
+        "mongodb-memory-server": "^11.3.0",
+        "nodemon": "^3.1.14",
+        "supertest": "^7.3.0"
       }
     },
     "summary": {
@@ -75,28 +93,34 @@
       "version": "1.0.0",
       "private": null,
       "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
+        "test": "node --test tests/*.test.js",
+        "test:watch": "node --test --watch tests/*.test.js",
         "start": "node index.js",
-        "dev": "nodemon server.js"
+        "dev": "nodemon index.js",
+        "lint": "eslint .",
+        "check": "node --check index.js && node --check app.js && node --check config.js && node --check models.js && node --check passport.js && node --check middleware/authorization.js && node --check middleware/errors.js && node --check middleware/resources.js && node --check middleware/validation.js && node --check routes/auth.js && node --check routes/movies.js && node --check routes/users.js"
       },
       "dependencies": {
-        "bcrypt": "^5.1.0",
-        "body-parser": "^1.20.2",
+        "bcrypt": "^6.0.0",
         "cors": "^2.8.5",
-        "express": "^4.18.2",
-        "express-validator": "^7.0.1",
-        "jsonwebtoken": "^9.0.1",
-        "lodash": "^4.17.21",
-        "mongoose": "^7.4.1",
-        "morgan": "^1.10.0",
+        "express": "^5.2.1",
+        "express-rate-limit": "^8.7.0",
+        "express-validator": "^7.3.2",
+        "helmet": "^8.3.0",
+        "jsonwebtoken": "^9.0.3",
+        "mongoose": "^8.24.4",
+        "morgan": "^1.12.1",
         "passport": "^0.6.0",
         "passport-jwt": "^4.0.1",
-        "passport-local": "^1.0.0",
-        "uuid": "^9.0.0"
+        "passport-local": "^1.0.0"
       },
       "devDependencies": {
-        "eslint": "^8.45.0",
-        "nodemon": "^3.0.1"
+        "@eslint/js": "^10.0.1",
+        "eslint": "^10.11.0",
+        "globals": "^17.12.0",
+        "mongodb-memory-server": "^11.3.0",
+        "nodemon": "^3.1.14",
+        "supertest": "^7.3.0"
       }
     },
     "categorizedDependencies": {
@@ -106,27 +130,30 @@
       "styling": [],
       "typeSystem": [],
       "lintingFormatting": [
-        "eslint"
+        "@eslint/js",
+        "eslint",
+        "globals"
       ],
       "buildTools": [
         "nodemon"
       ],
       "deployment": [],
       "dataContent": [
-        "mongoose"
+        "mongoose",
+        "mongodb-memory-server"
       ],
       "utilities": [
         "bcrypt",
-        "body-parser",
         "cors",
+        "express-rate-limit",
         "express-validator",
+        "helmet",
         "jsonwebtoken",
-        "lodash",
         "morgan",
         "passport",
         "passport-jwt",
         "passport-local",
-        "uuid"
+        "supertest"
       ]
     }
   }

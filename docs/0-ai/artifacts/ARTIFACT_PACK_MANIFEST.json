@@ -1,16 +1,16 @@
 {
-  "packId": "2026-09-26T22:39:21Z",
+  "packId": "2026-09-27T13:56:15Z",
   "runMode": "controller",
-  "generatedAt": "2026-09-26T22:39:21Z",
-  "verifiedAt": "2026-09-26T22:39:21Z",
+  "generatedAt": "2026-09-27T13:56:15Z",
+  "verifiedAt": "2026-09-27T13:56:15Z",
   "repoBranch": "refactor/portfolio-update",
-  "repoHead": "ece0ae9c1475593d6bce0de853452e523e9fe2e1",
+  "repoHead": "a2cd23ce61f9d1ce5922a9b2555d40c0b6741ea8",
   "scopeHeads": {
-    "docsHead": null,
-    "srcHead": null,
-    "depsHead": "6bdfb1ed88611060d5b9280381c9954f08e625de"
+    "docsHead": "515a8d08fc1282406c907a95356a87b581fcd253",
+    "srcHead": "a2cd23ce61f9d1ce5922a9b2555d40c0b6741ea8",
+    "depsHead": "a2cd23ce61f9d1ce5922a9b2555d40c0b6741ea8"
   },
-  "dirtyWorkingTree": false,
+  "dirtyWorkingTree": true,
   "stalenessSummary": {
     "counts": {
       "flagged": 6,
@@ -19,81 +19,113 @@
       "verified": 0
     },
     "scopeChanges": {
-      "docs": false,
-      "src": false,
-      "deps": false
+      "docs": true,
+      "src": true,
+      "deps": true
     },
     "warnings": [
-      "No prior manifest existed; initial-pack freshness was unknown.",
-      "The repository has no docs/ or src/ Git scope at the captured HEAD.",
-      "Runtime source uses a legacy root-level JavaScript layout; SRC_TREE and the snapshot record that layout instead of an absent src/ directory."
+      "Uncommitted documentation and artifact changes were present during verification; commit-aware staleness detection may not capture them.",
+      "The runtime source uses a root-level JavaScript layout; the src scope records app.js, index.js, config.js, models.js, passport.js, routes/, middleware/, and tests/ instead of an absent src/ directory.",
+      "The prior manifest recorded null docsHead and srcHead, so prior scope freshness was unavailable."
     ]
   },
   "artifacts": [
     {
       "artifactId": "SRC_TREE",
       "path": "docs/0-ai/artifacts/SRC_TREE.json",
-      "generatedAt": "2026-09-26T22:39:21Z",
-      "verifiedAt": "2026-09-26T22:39:21Z",
+      "generatedAt": "2026-09-27T13:56:15Z",
+      "verifiedAt": "2026-09-27T13:56:15Z",
       "status": "regenerated",
-      "sizeBytes": 1034,
-      "contentHash": "32f477b6b067674d01d1639904080384e5c586113fdbd3851cea0fd279263ada",
-      "dependsOnScopes": ["src"],
-      "scopeHeadsAtVerify": { "srcHead": null }
+      "sizeBytes": 3550,
+      "contentHash": "c517414781f4d3611f25511e17f106045ea895dbe4b3ab8634d07f57e2a94138",
+      "dependsOnScopes": [
+        "src"
+      ],
+      "scopeHeadsAtVerify": {
+        "srcHead": "a2cd23ce61f9d1ce5922a9b2555d40c0b6741ea8"
+      }
     },
     {
       "artifactId": "SRC_SNAPSHOT_1",
       "path": "docs/0-ai/artifacts/SRC_SNAPSHOT_1.tsx",
-      "generatedAt": "2026-09-26T22:39:21Z",
-      "verifiedAt": "2026-09-26T22:39:21Z",
+      "generatedAt": "2026-09-27T13:56:15Z",
+      "verifiedAt": "2026-09-27T13:56:15Z",
       "status": "regenerated",
-      "sizeBytes": 15622,
-      "contentHash": "4b8e6356806bb73be4498fb4b667d415e1ba6dd9a4211eef976417580169d66d",
-      "dependsOnScopes": ["src"],
-      "scopeHeadsAtVerify": { "srcHead": null }
+      "sizeBytes": 17714,
+      "contentHash": "57925d56eb41ca38fe07165a2fc7fd961ab5bbda1bfa4d6fc667be7548a71fa5",
+      "dependsOnScopes": [
+        "src"
+      ],
+      "scopeHeadsAtVerify": {
+        "srcHead": "a2cd23ce61f9d1ce5922a9b2555d40c0b6741ea8"
+      }
     },
     {
       "artifactId": "CONTEXT_SUMMARY",
       "path": "docs/0-ai/artifacts/CONTEXT_SUMMARY.md",
-      "generatedAt": "2026-09-26T22:39:21Z",
-      "verifiedAt": "2026-09-26T22:39:21Z",
+      "generatedAt": "2026-09-27T13:56:15Z",
+      "verifiedAt": "2026-09-27T13:56:15Z",
       "status": "regenerated",
-      "sizeBytes": 2812,
-      "contentHash": "efaab940e17508f1a7097394ed4ba9fb94452405d01b554be47d5671ad98089c",
-      "dependsOnScopes": ["src"],
-      "scopeHeadsAtVerify": { "srcHead": null }
+      "sizeBytes": 2193,
+      "contentHash": "1565f278648ca16156828a2bd3de423e8530e20350d6eab5407cbf87792381f4",
+      "dependsOnScopes": [
+        "src"
+      ],
+      "scopeHeadsAtVerify": {
+        "srcHead": "a2cd23ce61f9d1ce5922a9b2555d40c0b6741ea8"
+      }
     },
     {
       "artifactId": "PROJECT_OVERVIEW",
       "path": "docs/0-ai/artifacts/PROJECT_OVERVIEW.json",
-      "generatedAt": "2026-09-26T22:39:21Z",
-      "verifiedAt": "2026-09-26T22:39:21Z",
+      "generatedAt": "2026-09-27T13:56:15Z",
+      "verifiedAt": "2026-09-27T13:56:15Z",
       "status": "regenerated",
-      "sizeBytes": 2905,
-      "contentHash": "54b41466e46af3f6b2305975fe23bc34672c17a5d517ac012300c8a4f3342603",
-      "dependsOnScopes": ["docs", "deps"],
-      "scopeHeadsAtVerify": { "docsHead": null, "depsHead": "6bdfb1ed88611060d5b9280381c9954f08e625de" }
+      "sizeBytes": 4397,
+      "contentHash": "734c8f7686fcbeb18b788fbee02740c2bcb4844a93e7f1f0c0cbe3710933ea38",
+      "dependsOnScopes": [
+        "docs",
+        "deps"
+      ],
+      "scopeHeadsAtVerify": {
+        "docsHead": "515a8d08fc1282406c907a95356a87b581fcd253",
+        "depsHead": "a2cd23ce61f9d1ce5922a9b2555d40c0b6741ea8"
+      }
     },
     {
       "artifactId": "DOCS_TREE",
       "path": "docs/0-ai/artifacts/DOCS_TREE.json",
-      "generatedAt": "2026-09-26T22:39:21Z",
-      "verifiedAt": "2026-09-26T22:39:21Z",
+      "generatedAt": "2026-09-27T13:56:15Z",
+      "verifiedAt": "2026-09-27T13:56:15Z",
       "status": "regenerated",
-      "sizeBytes": 2669,
-      "contentHash": "eb3426a0c43d310583cefe01b6d66e960e4068649411aaaab14e858b228f06b0",
-      "dependsOnScopes": ["docs"],
-      "scopeHeadsAtVerify": { "docsHead": null }
+      "sizeBytes": 2957,
+      "contentHash": "e53c3763a33b8b74c0939c1825fbb9e357ad7604926b88ca52dfcb3607c807df",
+      "dependsOnScopes": [
+        "docs"
+      ],
+      "scopeHeadsAtVerify": {
+        "docsHead": "515a8d08fc1282406c907a95356a87b581fcd253"
+      }
     },
     {
       "artifactId": "ARTIFACT_PACK_MANIFEST",
       "path": "docs/0-ai/artifacts/ARTIFACT_PACK_MANIFEST.json",
-      "generatedAt": "2026-09-26T22:39:21Z",
-      "verifiedAt": "2026-09-26T22:39:21Z",
+      "generatedAt": "2026-09-27T13:56:15Z",
+      "verifiedAt": "2026-09-27T13:56:15Z",
       "status": "regenerated",
-      "dependsOnScopes": ["docs", "src", "deps"],
-      "scopeHeadsAtVerify": { "docsHead": null, "srcHead": null, "depsHead": "6bdfb1ed88611060d5b9280381c9954f08e625de" },
-      "warnings": ["Self-referential hash and size omitted by controller contract."]
+      "dependsOnScopes": [
+        "docs",
+        "src",
+        "deps"
+      ],
+      "scopeHeadsAtVerify": {
+        "docsHead": "515a8d08fc1282406c907a95356a87b581fcd253",
+        "srcHead": "a2cd23ce61f9d1ce5922a9b2555d40c0b6741ea8",
+        "depsHead": "a2cd23ce61f9d1ce5922a9b2555d40c0b6741ea8"
+      },
+      "warnings": [
+        "Self-referential hash and size omitted by controller contract."
+      ]
     }
   ]
 }

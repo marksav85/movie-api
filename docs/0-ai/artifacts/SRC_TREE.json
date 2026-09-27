@@ -1,33 +1,44 @@
 {
-  "generatedAt": "2026-09-26T22:39:21Z",
+  "generatedAt": "2026-09-27T13:56:15Z",
   "root": ".",
   "summary": {
-    "totalFiles": 4,
-    "totalDirectories": 0
+    "totalFiles": 12,
+    "totalDirectories": 2
   },
   "tree": [
     {
       "type": "file",
-      "name": "auth.js",
-      "relativePath": "auth.js",
+      "name": "app.js",
+      "relativePath": "app.js",
       "extension": ".js",
-      "sizeKB": 1.8,
+      "sizeKB": 1.9,
       "isComponent": false,
       "imports": [
-        "passport.js"
+        "config.js",
+        "routes/auth.js",
+        "routes/movies.js",
+        "routes/users.js",
+        "middleware/errors.js"
       ]
+    },
+    {
+      "type": "file",
+      "name": "config.js",
+      "relativePath": "config.js",
+      "extension": ".js",
+      "sizeKB": 2.7,
+      "isComponent": false,
+      "imports": []
     },
     {
       "type": "file",
       "name": "index.js",
       "relativePath": "index.js",
       "extension": ".js",
-      "sizeKB": 14.5,
+      "sizeKB": 1.3,
       "isComponent": false,
       "imports": [
-        "models.js",
-        "passport.js",
-        "auth.js"
+        "app.js"
       ]
     },
     {
@@ -44,10 +55,100 @@
       "name": "passport.js",
       "relativePath": "passport.js",
       "extension": ".js",
-      "sizeKB": 1.7,
+      "sizeKB": 1.4,
       "isComponent": false,
       "imports": [
+        "config.js",
         "models.js"
+      ]
+    },
+    {
+      "type": "directory",
+      "name": "middleware",
+      "relativePath": "middleware",
+      "children": [
+        {
+          "type": "file",
+          "name": "authorization.js",
+          "relativePath": "middleware/authorization.js",
+          "extension": ".js",
+          "sizeKB": 0.2,
+          "isComponent": false,
+          "imports": []
+        },
+        {
+          "type": "file",
+          "name": "errors.js",
+          "relativePath": "middleware/errors.js",
+          "extension": ".js",
+          "sizeKB": 0.6,
+          "isComponent": false,
+          "imports": []
+        },
+        {
+          "type": "file",
+          "name": "resources.js",
+          "relativePath": "middleware/resources.js",
+          "extension": ".js",
+          "sizeKB": 0.9,
+          "isComponent": false,
+          "imports": [
+            "models.js"
+          ]
+        },
+        {
+          "type": "file",
+          "name": "validation.js",
+          "relativePath": "middleware/validation.js",
+          "extension": ".js",
+          "sizeKB": 0.5,
+          "isComponent": false,
+          "imports": []
+        }
+      ]
+    },
+    {
+      "type": "directory",
+      "name": "routes",
+      "relativePath": "routes",
+      "children": [
+        {
+          "type": "file",
+          "name": "auth.js",
+          "relativePath": "routes/auth.js",
+          "extension": ".js",
+          "sizeKB": 1.2,
+          "isComponent": false,
+          "imports": [
+            "config.js",
+            "middleware/validation.js"
+          ]
+        },
+        {
+          "type": "file",
+          "name": "movies.js",
+          "relativePath": "routes/movies.js",
+          "extension": ".js",
+          "sizeKB": 1.2,
+          "isComponent": false,
+          "imports": [
+            "models.js"
+          ]
+        },
+        {
+          "type": "file",
+          "name": "users.js",
+          "relativePath": "routes/users.js",
+          "extension": ".js",
+          "sizeKB": 3.6,
+          "isComponent": false,
+          "imports": [
+            "models.js",
+            "middleware/authorization.js",
+            "middleware/resources.js",
+            "middleware/validation.js"
+          ]
+        }
       ]
     }
   ]

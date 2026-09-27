@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-09-26T22:39:21Z",
+  "generatedAt": "2026-09-27T13:56:15Z",
   "root": "docs",
   "summary": {
     "totalFiles": 6,
     "totalDirectories": 3,
     "byExtension": {
-      ".json": 4,
       ".md": 1,
+      ".json": 4,
       ".tsx": 1
     }
   },
@@ -26,60 +26,78 @@
               "name": "CONTEXT_SUMMARY.md",
               "relativePath": "docs/0-ai/artifacts/CONTEXT_SUMMARY.md",
               "extension": ".md",
-              "sizeKB": 2.7,
+              "sizeKB": 2.1,
               "tier": "core",
               "riskIfMissing": "medium",
-              "tags": ["artifacts", "context"]
+              "tags": [
+                "artifacts",
+                "context"
+              ]
             },
             {
               "type": "file",
               "name": "DOCS_TREE.json",
               "relativePath": "docs/0-ai/artifacts/DOCS_TREE.json",
               "extension": ".json",
-              "sizeKB": 2.7,
+              "sizeKB": 2.9,
               "tier": "core",
               "riskIfMissing": "medium",
-              "tags": ["artifacts", "structure"]
+              "tags": [
+                "artifacts",
+                "structure"
+              ]
             },
             {
               "type": "file",
               "name": "ARTIFACT_PACK_MANIFEST.json",
               "relativePath": "docs/0-ai/artifacts/ARTIFACT_PACK_MANIFEST.json",
               "extension": ".json",
-              "sizeKB": 3.6,
+              "sizeKB": 4.3,
               "tier": "core",
               "riskIfMissing": "medium",
-              "tags": ["artifacts", "status"]
+              "tags": [
+                "artifacts",
+                "status"
+              ]
             },
             {
               "type": "file",
               "name": "PROJECT_OVERVIEW.json",
               "relativePath": "docs/0-ai/artifacts/PROJECT_OVERVIEW.json",
               "extension": ".json",
-              "sizeKB": 2.8,
+              "sizeKB": 4.3,
               "tier": "core",
               "riskIfMissing": "medium",
-              "tags": ["artifacts", "context"]
+              "tags": [
+                "artifacts",
+                "context"
+              ]
             },
             {
               "type": "file",
               "name": "SRC_SNAPSHOT_1.tsx",
               "relativePath": "docs/0-ai/artifacts/SRC_SNAPSHOT_1.tsx",
               "extension": ".tsx",
-              "sizeKB": 15.3,
+              "sizeKB": 17.3,
               "tier": "core",
               "riskIfMissing": "medium",
-              "tags": ["artifacts", "context"]
+              "tags": [
+                "artifacts",
+                "context"
+              ]
             },
             {
               "type": "file",
               "name": "SRC_TREE.json",
               "relativePath": "docs/0-ai/artifacts/SRC_TREE.json",
               "extension": ".json",
-              "sizeKB": 1.0,
+              "sizeKB": 3.5,
               "tier": "core",
               "riskIfMissing": "medium",
-              "tags": ["artifacts", "structure"]
+              "tags": [
+                "artifacts",
+                "structure"
+              ]
             }
           ]
         }
