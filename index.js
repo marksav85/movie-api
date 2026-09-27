@@ -97,7 +97,7 @@ app.use(cors(corsOptions));
 require("./passport");
 app.use("/login", loginLimiter);
 app.locals.loginLimiterStore = loginLimiterStore;
-const auth = require("./auth")(app);
+require("./auth")(app);
 
 /**
  * @description Add a user
@@ -568,7 +568,7 @@ app.get("/", (req, res) => {
  * Response data format
  * "Something broke!"
  */
-app.use((err, req, res, next) => {
+app.use((err, req, res, _next) => {
   if (err.type === "entity.too.large") {
     return res.status(413).json({ message: "Request body too large" });
   }
