@@ -1,4 +1,4 @@
-const { after, before, test } = require("node:test");
+const { after, afterEach, before, test } = require("node:test");
 const assert = require("node:assert/strict");
 const { spawnSync } = require("node:child_process");
 const path = require("node:path");
@@ -9,6 +9,13 @@ const request = require("supertest");
 
 const testJwtSecret = "phase-2-test-secret-that-is-long-enough-to-be-safe";
 process.env.JWT_SECRET = testJwtSecret;
+process.env.NODE_ENV = "test";
+process.env.CORS_ALLOWED_ORIGINS = "http://allowed.test";
+process.env.LOGIN_RATE_LIMIT_WINDOW_MS = "60000";
+process.env.LOGIN_RATE_LIMIT_MAX = "2";
+process.env.API_RATE_LIMIT_WINDOW_MS = "60000";
+process.env.API_RATE_LIMIT_MAX = "1000";
+process.env.JSON_BODY_LIMIT = "16kb";
 
 const app = require("../index");
 const Models = require("../models");
@@ -59,11 +66,31 @@ after(async () => {
   await mongoServer.stop();
 });
 
+afterEach(() => {
+  app.locals.loginLimiterStore.resetAll();
+});
+
 test("GET / returns the legacy welcome text", async () => {
   const response = await request(app).get("/");
 
   assert.equal(response.status, 200);
   assert.equal(response.text, "Welcome to MyFlix!");
+});
+
+test("security headers and configured CORS origins are handled deliberately", async () => {
+  const allowed = await request(app).get("/").set("Origin", "http://allowed.test");
+  const disallowed = await request(app).get("/").set("Origin", "http://disallowed.test");
+  const noOrigin = await request(app).get("/");
+
+  assert.equal(allowed.status, 200);
+  assert.equal(allowed.headers["access-control-allow-origin"], "http://allowed.test");
+  assert.equal(allowed.headers["x-content-type-options"], "nosniff");
+  assert.equal(allowed.headers["x-frame-options"], "SAMEORIGIN");
+  assert.equal(disallowed.status, 403);
+  assert.deepEqual(disallowed.body, { message: "Origin not allowed" });
+  assert.equal(disallowed.headers["access-control-allow-origin"], undefined);
+  assert.equal(noOrigin.status, 200);
+  assert.equal(noOrigin.headers["access-control-allow-origin"], undefined);
 });
 
 test("missing or placeholder JWT_SECRET prevents the application from starting", () => {
@@ -79,6 +106,21 @@ test("missing or placeholder JWT_SECRET prevents the application from starting",
     assert.notEqual(result.status, 0);
     assert.match(result.stderr, /JWT_SECRET must be configured/);
   }
+});
+
+test("production configuration requires explicit CORS origins", () => {
+  const result = spawnSync(process.execPath, ["-e", "require('./config')"], {
+    cwd: path.resolve(__dirname, ".."),
+    env: {
+      ...process.env,
+      NODE_ENV: "production",
+      CORS_ALLOWED_ORIGINS: "",
+    },
+    encoding: "utf8",
+  });
+
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /CORS_ALLOWED_ORIGINS must be configured/);
 });
 
 test("POST /users retains registration validation and omits Password from its response", async () => {
@@ -135,6 +177,53 @@ test("POST /login rejects incorrect credentials without exposing the submitted p
   assert.equal(JSON.stringify(response.body).includes("incorrect-password"), false);
 });
 
+test("POST /login validates required credentials and applies the configured rate limit", async () => {
+  const malformed = await request(app).post("/login").send({ Username: primaryUser.Username });
+  app.locals.loginLimiterStore.resetAll();
+  const first = await request(app).post("/login").send({
+    Username: primaryUser.Username,
+    Password: "incorrect-password",
+  });
+  const second = await request(app).post("/login").send({
+    Username: primaryUser.Username,
+    Password: "incorrect-password",
+  });
+  const limited = await request(app).post("/login").send({
+    Username: primaryUser.Username,
+    Password: "incorrect-password",
+  });
+
+  assert.equal(malformed.status, 400);
+  assert.deepEqual(malformed.body, { message: "Invalid login credentials" });
+  assert.equal(first.status, 400);
+  assert.equal(second.status, 400);
+  assert.equal(limited.status, 429);
+  assert.deepEqual(limited.body, {
+    message: "Too many login attempts. Please try again later.",
+  });
+});
+
+test("oversized JSON and invalid profile updates are rejected as controlled client errors", async () => {
+  const oversized = await request(app)
+    .post("/login")
+    .set("Content-Type", "application/json")
+    .send({ Username: primaryUser.Username, Password: "x".repeat(17 * 1024) });
+  const invalidUpdate = await request(app)
+    .put(`/users/${primaryUser.Username}`)
+    .set(authHeaderFor(primaryUser))
+    .send({
+      Username: "bad name",
+      Password: "valid-password",
+      Email: "not-an-email",
+      Birthday: "not-a-date",
+    });
+
+  assert.equal(oversized.status, 413);
+  assert.deepEqual(oversized.body, { message: "Request body too large" });
+  assert.equal(invalidUpdate.status, 422);
+  assert.ok(Array.isArray(invalidUpdate.body.errors));
+});
+
 test("protected endpoints reject requests without a bearer token or with an invalid JWT", async () => {
   const response = await request(app).get("/movies");
   const invalidToken = jwt.sign(primaryUser.toJSON(), "different-test-secret-that-is-long-enough", {
@@ -168,6 +257,23 @@ test("movie retrieval routes preserve fields and successful response shapes", as
   assert.equal(byGenre.body[0].Genre.Name, "Drama");
   assert.equal(byDirector.status, 200);
   assert.equal(byDirector.body[0].Director.Name, "Fixture Director");
+});
+
+test("unexpected database errors return a safe 5xx response", async () => {
+  const originalFind = Movies.find;
+  Movies.find = () => {
+    throw new Error("mongodb://username:password@database.example.test");
+  };
+
+  try {
+    const response = await request(app).get("/movies").set(authHeaderFor(primaryUser));
+
+    assert.equal(response.status, 500);
+    assert.deepEqual(response.body, { message: "Internal server error" });
+    assert.equal(response.text.includes("mongodb://"), false);
+  } finally {
+    Movies.find = originalFind;
+  }
 });
 
 test("missing movie and user detail resources return 404", async () => {

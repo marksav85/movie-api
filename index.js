@@ -1,10 +1,13 @@
 const express = require("express");
+const { MemoryStore, rateLimit } = require("express-rate-limit");
+const helmet = require("helmet");
 const morgan = require("morgan");
 const uuid = require("uuid");
 const mongoose = require("mongoose");
 const { check, validationResult } = require("express-validator");
 const cors = require("cors");
 const passport = require("passport");
+const config = require("./config");
 const Models = require("./models.js");
 
 const app = express();
@@ -50,15 +53,51 @@ const validateFavoriteMovie = async (req, res, next) => {
   }
 };
 
+const corsOptions = {
+  origin(origin, callback) {
+    if (!origin || config.corsAllowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    const error = new Error("Origin not allowed");
+    error.status = 403;
+    return callback(error);
+  },
+};
+
+const apiLimiter = rateLimit({
+  windowMs: config.apiRateLimitWindowMs,
+  limit: config.apiRateLimitMax,
+  legacyHeaders: false,
+  standardHeaders: "draft-7",
+  handler: (req, res) =>
+    res.status(429).json({ message: "Too many requests. Please try again later." }),
+});
+
+const loginLimiterStore = new MemoryStore();
+const loginLimiter = rateLimit({
+  windowMs: config.loginRateLimitWindowMs,
+  limit: config.loginRateLimitMax,
+  store: loginLimiterStore,
+  legacyHeaders: false,
+  standardHeaders: "draft-7",
+  handler: (req, res) =>
+    res.status(429).json({ message: "Too many login attempts. Please try again later." }),
+});
+
 // Middleware
-app.use(morgan("common"));
-app.use(express.json());
+app.use(helmet());
+app.use(morgan(config.nodeEnv === "production" ? "combined" : "dev"));
+app.use(apiLimiter);
+app.use(express.json({ limit: config.jsonBodyLimit }));
 app.use(express.static("public"));
-app.use(express.urlencoded({ extended: true }));
-app.use(cors());
+app.use(express.urlencoded({ extended: true, limit: config.jsonBodyLimit }));
+app.use(cors(corsOptions));
 
 // Passport and Auth
 require("./passport");
+app.use("/login", loginLimiter);
+app.locals.loginLimiterStore = loginLimiterStore;
 const auth = require("./auth")(app);
 
 /**
@@ -95,7 +134,7 @@ app.post(
     check("Password", "Password is required").not().isEmpty(),
     check("Email", "Email does not appear to be valid").isEmail(),
   ],
-  async (req, res) => {
+  async (req, res, next) => {
     // Check the validation object for errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -118,8 +157,7 @@ app.post(
       });
       res.status(201).json(newUser);
     } catch (error) {
-      console.error(error);
-      res.status(500).send("Error: " + error);
+      next(error);
     }
   }
 );
@@ -253,10 +291,23 @@ app.delete(
  */
 app.put(
   "/users/:Username",
+  [
+    check("Username", "Username is required").isString().not().isEmpty(),
+    check("Password", "Password is required").isString().not().isEmpty(),
+    check("Email", "Email does not appear to be valid").isEmail(),
+    check("Birthday", "Birthday must be a valid date")
+      .optional({ checkFalsy: true })
+      .isISO8601(),
+  ],
   passport.authenticate("jwt", { session: false }),
   loadRequestedUser,
   requireSelf,
   async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    }
+
     try {
       const updatedUser = await Users.findByIdAndUpdate(
         req.requestedUser._id,
@@ -301,13 +352,12 @@ app.put(
 app.get(
   "/users",
   passport.authenticate("jwt", { session: false }),
-  async (req, res) => {
+  async (req, res, next) => {
     try {
       const users = await Users.find();
       res.status(200).json(users);
     } catch (error) {
-      console.error(error);
-      res.status(500).send("Error: " + error);
+      next(error);
     }
   }
 );
@@ -339,7 +389,7 @@ app.get(
   passport.authenticate("jwt", { session: false }),
   loadRequestedUser,
   requireSelf,
-  async (req, res) => {
+  (req, res) => {
     res.json(req.requestedUser);
   }
 );
@@ -369,13 +419,12 @@ app.get(
 app.get(
   "/movies",
   passport.authenticate("jwt", { session: false }),
-  async (req, res) => {
+  async (req, res, next) => {
     try {
       const movies = await Movies.find();
       res.status(200).json(movies);
     } catch (error) {
-      console.error(error);
-      res.status(500).send("Error: " + error);
+      next(error);
     }
   }
 );
@@ -405,7 +454,7 @@ app.get(
 app.get(
   "/movies/:Title",
   passport.authenticate("jwt", { session: false }),
-  async (req, res) => {
+  async (req, res, next) => {
     try {
       const movie = await Movies.findOne({ Title: req.params.Title });
       if (!movie) {
@@ -413,8 +462,7 @@ app.get(
       }
       res.json(movie);
     } catch (error) {
-      console.error(error);
-      res.status(500).send("Error: " + error);
+      next(error);
     }
   }
 );
@@ -446,13 +494,12 @@ app.get(
 app.get(
   "/movies/genre/:Name",
   passport.authenticate("jwt", { session: false }),
-  async (req, res) => {
+  async (req, res, next) => {
     try {
       const movies = await Movies.find({ "Genre.Name": req.params.Name });
       res.json(movies);
     } catch (error) {
-      console.error(error);
-      res.status(500).send("Error: " + error);
+      next(error);
     }
   }
 );
@@ -484,13 +531,12 @@ app.get(
 app.get(
   "/movies/director/:Name",
   passport.authenticate("jwt", { session: false }),
-  async (req, res) => {
+  async (req, res, next) => {
     try {
       const movies = await Movies.find({ "Director.Name": req.params.Name });
       res.json(movies);
     } catch (error) {
-      console.error(error);
-      res.status(500).send("Error: " + error);
+      next(error);
     }
   }
 );
@@ -524,8 +570,20 @@ app.get("/", (req, res) => {
  * "Something broke!"
  */
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).send("Something broke!");
+  if (err.type === "entity.too.large") {
+    return res.status(413).json({ message: "Request body too large" });
+  }
+
+  if (err instanceof SyntaxError && "body" in err) {
+    return res.status(400).json({ message: "Invalid JSON request body" });
+  }
+
+  if (err.status === 403 && err.message === "Origin not allowed") {
+    return res.status(403).json({ message: "Origin not allowed" });
+  }
+
+  console.error("Unhandled request error", err.name || "Error");
+  return res.status(500).json({ message: "Internal server error" });
 });
 
 // Start the HTTP server only when this file is executed directly. Exporting the
