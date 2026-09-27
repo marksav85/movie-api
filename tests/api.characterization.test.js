@@ -1,16 +1,20 @@
 const { after, before, test } = require("node:test");
 const assert = require("node:assert/strict");
+const { spawnSync } = require("node:child_process");
+const path = require("node:path");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 const { MongoMemoryServer } = require("mongodb-memory-server");
 const request = require("supertest");
+
+const testJwtSecret = "phase-2-test-secret-that-is-long-enough-to-be-safe";
+process.env.JWT_SECRET = testJwtSecret;
 
 const app = require("../index");
 const Models = require("../models");
 
 const Movies = Models.Movie;
 const Users = Models.User;
-const legacyJwtSecret = "your_jwt_secret";
 
 let mongoServer;
 let primaryUser;
@@ -18,7 +22,7 @@ let secondaryUser;
 let movie;
 
 const authHeaderFor = (user) => ({
-  Authorization: `Bearer ${jwt.sign(user.toJSON(), legacyJwtSecret, {
+  Authorization: `Bearer ${jwt.sign(user.toJSON(), testJwtSecret, {
     algorithm: "HS256",
     expiresIn: "7d",
     subject: user.Username,
@@ -62,7 +66,22 @@ test("GET / returns the legacy welcome text", async () => {
   assert.equal(response.text, "Welcome to MyFlix!");
 });
 
-test("POST /users retains registration validation, response status, and password exposure", async () => {
+test("missing or placeholder JWT_SECRET prevents the application from starting", () => {
+  const projectRoot = path.resolve(__dirname, "..");
+
+  for (const JWT_SECRET of [undefined, "your_jwt_secret", "replace-with-a-long-random-secret"]) {
+    const result = spawnSync(process.execPath, ["-e", "require('./index')"], {
+      cwd: projectRoot,
+      env: { ...process.env, JWT_SECRET },
+      encoding: "utf8",
+    });
+
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /JWT_SECRET must be configured/);
+  }
+});
+
+test("POST /users retains registration validation and omits Password from its response", async () => {
   const invalidResponse = await request(app).post("/users").send({});
   assert.equal(invalidResponse.status, 422);
   assert.ok(Array.isArray(invalidResponse.body.errors));
@@ -76,25 +95,58 @@ test("POST /users retains registration validation, response status, and password
 
   assert.equal(response.status, 201);
   assert.equal(response.body.Username, "registereduser");
-  assert.match(response.body.Password, /^\$2[aby]\$/);
+  assert.equal(Object.hasOwn(response.body, "Password"), false);
 });
 
-test("POST /login returns the legacy user/token response and exposes the password hash", async () => {
-  const response = await request(app).post("/login").send({
-    Username: primaryUser.Username,
-    Password: "primary-password",
-  });
+test("POST /login returns a configured JWT and omits Password without credential logging", async () => {
+  const originalConsoleLog = console.log;
+  const loggedValues = [];
+  console.log = (...args) => loggedValues.push(args);
+
+  let response;
+  try {
+    response = await request(app).post("/login").send({
+      Username: primaryUser.Username,
+      Password: "primary-password",
+    });
+  } finally {
+    console.log = originalConsoleLog;
+  }
 
   assert.equal(response.status, 200);
   assert.equal(response.body.user.Username, primaryUser.Username);
-  assert.match(response.body.user.Password, /^\$2[aby]\$/);
+  assert.equal(Object.hasOwn(response.body.user, "Password"), false);
   assert.equal(typeof response.body.token, "string");
+  assert.equal(loggedValues.length, 0);
+
+  const tokenResponse = await request(app)
+    .get("/movies")
+    .set({ Authorization: `Bearer ${response.body.token}` });
+  assert.equal(tokenResponse.status, 200);
 });
 
-test("protected endpoints reject requests without a bearer token", async () => {
+test("POST /login rejects incorrect credentials without exposing the submitted password", async () => {
+  const response = await request(app).post("/login").send({
+    Username: primaryUser.Username,
+    Password: "incorrect-password",
+  });
+
+  assert.equal(response.status, 400);
+  assert.equal(JSON.stringify(response.body).includes("incorrect-password"), false);
+});
+
+test("protected endpoints reject requests without a bearer token or with an invalid JWT", async () => {
   const response = await request(app).get("/movies");
+  const invalidToken = jwt.sign(primaryUser.toJSON(), "different-test-secret-that-is-long-enough", {
+    algorithm: "HS256",
+    expiresIn: "7d",
+  });
+  const invalidTokenResponse = await request(app)
+    .get("/movies")
+    .set({ Authorization: `Bearer ${invalidToken}` });
 
   assert.equal(response.status, 401);
+  assert.equal(invalidTokenResponse.status, 401);
 });
 
 test("movie retrieval routes preserve fields and successful response shapes", async () => {
@@ -129,20 +181,20 @@ test("missing single resources currently return 200 with a null JSON body", asyn
   assert.equal(missingUser.body, null);
 });
 
-test("GET /users and GET /users/:Username expose all users and password hashes to an authenticated user", async () => {
+test("GET /users and GET /users/:Username retain broad legacy access without exposing Password", async () => {
   const headers = authHeaderFor(primaryUser);
   const allUsers = await request(app).get("/users").set(headers);
   const otherUser = await request(app).get(`/users/${secondaryUser.Username}`).set(headers);
 
   assert.equal(allUsers.status, 200);
   assert.ok(allUsers.body.some((user) => user.Username === secondaryUser.Username));
-  assert.match(allUsers.body[0].Password, /^\$2[aby]\$/);
+  assert.ok(allUsers.body.every((user) => !Object.hasOwn(user, "Password")));
   assert.equal(otherUser.status, 200);
   assert.equal(otherUser.body.Username, secondaryUser.Username);
-  assert.match(otherUser.body.Password, /^\$2[aby]\$/);
+  assert.equal(Object.hasOwn(otherUser.body, "Password"), false);
 });
 
-test("PUT /users/:Username permits self updates, returns 201, and stores a supplied password unchanged", async () => {
+test("PUT /users/:Username hashes replacement passwords, omits Password, and permits login with the new password", async () => {
   const response = await request(app)
     .put(`/users/${primaryUser.Username}`)
     .set(authHeaderFor(primaryUser))
@@ -155,8 +207,15 @@ test("PUT /users/:Username permits self updates, returns 201, and stores a suppl
 
   const storedUser = await Users.findById(primaryUser.id);
   assert.equal(response.status, 201);
-  assert.equal(response.body.Password, "unhashed-characterization-password");
-  assert.equal(storedUser.Password, "unhashed-characterization-password");
+  assert.equal(Object.hasOwn(response.body, "Password"), false);
+  assert.notEqual(storedUser.Password, "unhashed-characterization-password");
+  assert.match(storedUser.Password, /^\$2[aby]\$/);
+
+  const loginResponse = await request(app).post("/login").send({
+    Username: primaryUser.Username,
+    Password: "unhashed-characterization-password",
+  });
+  assert.equal(loginResponse.status, 200);
 });
 
 test("PUT /users/:Username rejects an authenticated cross-user update with the legacy response", async () => {
@@ -186,6 +245,7 @@ test("favourite mutations allow cross-user writes and duplicate movie references
   assert.equal(second.status, 200);
   assert.equal(second.body.Username, secondaryUser.Username);
   assert.equal(second.body.FavoriteMovies.length, 2);
+  assert.equal(Object.hasOwn(second.body, "Password"), false);
 });
 
 test("DELETE /users/:Username/movies/:MovieID permits a cross-user favourite removal", async () => {
@@ -196,6 +256,7 @@ test("DELETE /users/:Username/movies/:MovieID permits a cross-user favourite rem
   assert.equal(response.status, 200);
   assert.equal(response.body.Username, secondaryUser.Username);
   assert.deepEqual(response.body.FavoriteMovies, []);
+  assert.equal(Object.hasOwn(response.body, "Password"), false);
 });
 
 test("DELETE /users/:Username permits cross-user deletion and preserves its legacy response", async () => {
