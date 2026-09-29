@@ -4,7 +4,7 @@
 
 ## Technology
 
-- Node.js 24 is the declared target; the supported engine range is Node `>=22 <25`.
+- Node.js 24 is the declared target; the supported engine range is Node `>=22.22.2 <25`.
 - Express 5, Mongoose 8, MongoDB, Passport local and JWT strategies, and bcrypt 6.
 - Helmet, configurable CORS, request-size limits, rate limiting, and centralized error handling.
 - Node's built-in test runner, Supertest, and MongoDB Memory Server for isolated API and process integration tests.
@@ -36,6 +36,8 @@ tests/                 API contract and process integration tests
 4. Start the API with `npm start`, or use `npm run dev` for nodemon-based local restart support.
 
 The server connects to MongoDB before opening its HTTP listener. If the database connection fails, it does not start listening. `SIGINT` and `SIGTERM` close the listener and MongoDB connection before exit.
+
+`npm start` and `npm run dev` load a root `.env` when it exists. In deployments, the same commands work without that file and externally supplied environment variables take precedence.
 
 ### Environment
 
