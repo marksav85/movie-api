@@ -366,6 +366,39 @@ test("GET /users/:Username permits self access and rejects another user", async 
   assert.deepEqual(otherUser.body, { message: "Forbidden" });
 });
 
+test("PUT /users/:Username requires missing or empty Password without changing the user", async () => {
+  const before = await Users.findById(primaryUser.id);
+  for (const password of [undefined, ""]) {
+    const response = await request(app)
+      .put(`/users/${primaryUser.Username}`)
+      .set(authHeaderFor(primaryUser))
+      .send({ Username: primaryUser.Username, Email: "not-applied@example.test", ...(password === undefined ? {} : { Password: password }) });
+    assert.equal(response.status, 422);
+    assert.ok(response.body.errors.some(error => error.path === "Password" && error.msg === "Password is required"));
+    assert.equal(Object.hasOwn(response.body, "Password"), false);
+    const after = await Users.findById(primaryUser.id);
+    assert.equal(after.Password, before.Password);
+    assert.equal(after.Email, before.Email);
+  }
+});
+
+test("PUT /users/:Username rehashes the same effective password and preserves login", async () => {
+  const before = await Users.findById(primaryUser.id);
+  const response = await request(app)
+    .put(`/users/${primaryUser.Username}`)
+    .set(authHeaderFor(primaryUser))
+    .send({ Username: primaryUser.Username, Password: "primary-password", Email: "same-password@example.test" });
+  assert.equal(response.status, 201);
+  assert.equal(response.body.Email, "same-password@example.test");
+  assert.equal(Object.hasOwn(response.body, "Password"), false);
+  const after = await Users.findById(primaryUser.id);
+  assert.notEqual(after.Password, before.Password);
+  assert.equal(after.validatePassword("primary-password"), true);
+  const login = await request(app).post("/login").send({ Username: primaryUser.Username, Password: "primary-password" });
+  assert.equal(login.status, 200);
+  assert.equal(Object.hasOwn(login.body.user, "Password"), false);
+});
+
 test("PUT /users/:Username hashes replacement passwords, omits Password, and permits login with the new password", async () => {
   const response = await request(app)
     .put(`/users/${primaryUser.Username}`)
@@ -383,11 +416,15 @@ test("PUT /users/:Username hashes replacement passwords, omits Password, and per
   assert.notEqual(storedUser.Password, "unhashed-characterization-password");
   assert.match(storedUser.Password, /^\$2[aby]\$/);
 
+  const oldLogin = await request(app).post("/login").send({ Username: primaryUser.Username, Password: "primary-password" });
+  assert.equal(oldLogin.status, 400);
+
   const loginResponse = await request(app).post("/login").send({
     Username: primaryUser.Username,
     Password: "unhashed-characterization-password",
   });
   assert.equal(loginResponse.status, 200);
+  assert.equal(Object.hasOwn(loginResponse.body.user, "Password"), false);
 });
 
 test("PUT /users/:Username rejects an authenticated cross-user update", async () => {
