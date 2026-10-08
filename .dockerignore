@@ -1,0 +1,15 @@
+# Allow only production dependency manifests and API runtime sources.
+**
+!package.json
+!package-lock.json
+!app.js
+!index.js
+!config.js
+!models.js
+!passport.js
+!middleware/
+!middleware/**
+!routes/
+!routes/**
+!Dockerfile
+!.dockerignore

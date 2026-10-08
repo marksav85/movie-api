@@ -1,0 +1,31 @@
+name: movie-api
+services:
+  movie-api:
+    image: movie-api:${MOVIE_API_IMAGE_TAG:-local}
+    build:
+      context: .
+      target: production
+    env_file:
+      - .env.production
+    environment:
+      NODE_ENV: production
+      PORT: "8080"
+    restart: unless-stopped
+    init: true
+    stop_grace_period: 45s
+    networks:
+      - msd-proxy
+    logging:
+      driver: local
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8080/', {signal: AbortSignal.timeout(4000)}).then(r => {if (r.status !== 200) process.exit(1)}).catch(() => process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+networks:
+  msd-proxy:
+    external: true

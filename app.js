@@ -12,6 +12,7 @@ const { errorHandler } = require("./middleware/errors");
 require("./passport");
 
 const app = express();
+app.set("trust proxy", config.trustProxyHops);
 
 const corsOptions = {
   origin(origin, callback) {

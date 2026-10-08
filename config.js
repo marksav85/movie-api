@@ -1,6 +1,11 @@
 const exampleJwtSecret = "replace-with-a-long-random-secret";
 const jwtSecret = process.env.JWT_SECRET;
 const nodeEnv = process.env.NODE_ENV || "development";
+const trustProxyValue = process.env.TRUST_PROXY_HOPS ?? "0";
+if (!/^[01]$/.test(trustProxyValue)) {
+  throw new Error("TRUST_PROXY_HOPS must be 0 (direct) or 1 (Caddy only).");
+}
+const trustProxyHops = Number(trustProxyValue);
 const developmentCorsOrigins = [
   "http://localhost:1234",
   "http://127.0.0.1:1234",
@@ -103,4 +108,5 @@ module.exports = {
   loginRateLimitMax,
   loginRateLimitWindowMs,
   nodeEnv,
+  trustProxyHops,
 };
