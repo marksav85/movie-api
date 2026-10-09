@@ -34,6 +34,11 @@ NODE
 ```sh
 docker network create movie-api-test
 docker run -d --name movie-api-test-db --network movie-api-test mongo:8
+```
+
+Allow the disposable MongoDB container time to initialize before starting the API:
+
+```sh
 docker run -d --name movie-api-test --network movie-api-test --env-file /tmp/movie-api.docker.env -p 127.0.0.1:8080:8080 movie-api:local
 # Local connection URI: mongodb://movie-api-test-db:27017/movie-api-test
 curl --fail http://127.0.0.1:8080/
@@ -44,7 +49,7 @@ docker network rm movie-api-test
 rm /tmp/movie-api.docker.env
 ```
 
-The expected response is `Welcome to MyFlix!`. Allow the disposable database time to initialize before starting the API.
+The expected response is `Welcome to MyFlix!`. If the application is still starting, wait briefly and retry the welcome-route request before cleanup.
 
 ## Production configuration and release updates
 
@@ -66,7 +71,9 @@ api.myflix.marksavilledesigns.com {
 
 If changing Caddy routing, validate and reload Caddy using the existing proxy Compose project. That project is managed separately and is not included here. Caddy must overwrite untrusted client-supplied forwarded headers using its normal reverse-proxy behavior. Numeric one-hop trust assumes every incoming connection comes through Caddy: do not expose port 8080, and treat all members of `msd-proxy` as trusted infrastructure. An untrusted container with direct access could supply a forged client IP. Local/direct usage must retain `TRUST_PROXY_HOPS=0`; unrestricted trust is rejected.
 
-For a release update, an operator can run the following after confirming the project directory and preserving the previous image:
+Before launching or replacing the production API container, verify outbound DNS and MongoDB Atlas connectivity/readiness from the VPS as described above. The application connects to MongoDB before opening its HTTP listener.
+
+For a release update, an operator can run the following after completing that verification, confirming the project directory, and preserving the previous image:
 
 ```sh
 cd /opt/msd/projects/movie-api
@@ -79,6 +86,10 @@ sudo docker compose ps
 sudo docker compose logs --tail=100 movie-api
 curl --fail https://api.myflix.marksavilledesigns.com/
 ```
+
+If the application is still starting, wait briefly and retry the welcome-route request; the expected response is `Welcome to MyFlix!`.
+
+Use the intended `MOVIE_API_IMAGE_TAG` for every subsequent Compose operation that recreates or updates the service, following the same `sudo env MOVIE_API_IMAGE_TAG=...` convention. If the variable is unset or empty, Compose falls back to `local`, potentially selecting a different image from the deployed release.
 
 Avoid printing expanded Compose configuration: it includes environment secrets. The HTTP healthcheck requests the existing public `GET /` inside the container every 30 seconds, with a 4-second request deadline, a 5-second check timeout, three retries, and a 60-second startup allowance. It checks HTTP availability only; it does not query Atlas or create a new endpoint. Health requests count toward the existing API rate limit, so keep that limit above the probe traffic (30 requests per default 15-minute window). An unhealthy status does not itself trigger Docker restart; the restart policy applies to process exits. Logs use Docker's `local` driver, capped at three 10 MB files. `init: true` forwards signals, and shutdown has 45 seconds before forced termination.
 
