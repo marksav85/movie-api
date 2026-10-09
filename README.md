@@ -1,19 +1,29 @@
-# movie-api
+# myFlix Movie API
 
-`movie-api` is the local Node.js backend for the myFlix portfolio project. It serves the movie catalogue, user accounts, and favourites used by the related React and Angular myFlix clients. The clients remain separate projects and are not changed here.
+myFlix Movie API is the deployed Express backend for the myFlix portfolio project. It serves the movie catalogue, user accounts, and favourites shared by separate React and Angular clients. The API has completed its migration to a Contabo VPS.
+
+## Architecture
+
+The React and Angular frontends are hosted on Cloudflare Workers. Browser requests reach Caddy on the Contabo VPS over HTTPS; Caddy terminates HTTPS and proxies requests to the Dockerized Express API, which connects to MongoDB Atlas.
+
+```text
+React / Angular (Cloudflare Workers)
+    → HTTPS → Caddy (Contabo VPS)
+    → Express API (Docker) → MongoDB Atlas
+```
+
+| Service | Production endpoint |
+| --- | --- |
+| API | [api.myflix.marksavilledesigns.com](https://api.myflix.marksavilledesigns.com) |
+| React | [react.myflix.marksavilledesigns.com](https://react.myflix.marksavilledesigns.com) |
+| Angular | [angular.myflix.marksavilledesigns.com](https://angular.myflix.marksavilledesigns.com) |
 
 ## Technology
 
-- Node.js 24 is the declared target; the supported engine range is Node `>=22.22.2 <25`.
+- Node.js: `package.json` declares the supported engine range `>=22.22.2 <25`; the Docker image pins Node.js `24.21.0-bookworm-slim`. The live container version has not been independently verified.
 - Express 5, Mongoose 8, MongoDB, Passport local and JWT strategies, and bcrypt 6.
 - Helmet, configurable CORS, request-size limits, rate limiting, and centralized error handling.
 - Node's built-in test runner, Supertest, and MongoDB Memory Server for isolated API and process integration tests.
-
-Node 22 remains supported while deployment compatibility with Node 24 is verified. Use a currently supported Node version, then install from the lockfile:
-
-```sh
-npm ci
-```
 
 ## Project layout
 
@@ -28,16 +38,26 @@ middleware/            Authorization, validation, resources, and error handling
 tests/                 API contract and process integration tests
 ```
 
-## Local setup
+## Local development
 
-1. Start a local MongoDB instance, or provide a development connection URI.
-2. Copy `.env.example` to `.env` and replace the example JWT secret with a unique random value of at least 32 bytes.
-3. Install dependencies with `npm ci`.
-4. Start the API with `npm start`, or use `npm run dev` for nodemon-based local restart support.
+Prerequisites: Node.js within `>=22.22.2 <25`, npm, and a reachable local MongoDB instance or a separate development database. Docker Engine is optional for the [container smoke tests](docs/deployment.md#local-build-and-smoke-test); production Compose operations also require Docker Compose.
+
+1. Copy `.env.example` to `.env`. Configure `CONNECTION_URI` for your development database and `JWT_SECRET` with a unique random value of at least 32 bytes. Keep `TRUST_PROXY_HOPS=0` for direct local access.
+2. Install dependencies from the lockfile with `npm ci`.
+3. Start the development server with `npm run dev` for nodemon-based restarts, or use `npm start`.
+4. With the server running, verify the welcome route:
+
+   ```sh
+   curl --fail http://localhost:8080/
+   ```
+
+   The expected response is `Welcome to MyFlix!`. Adjust the port if you configured a different `PORT`. This verifies HTTP availability, not a database query.
+
+There is no automatic movie-data seed script. Provide development movie records separately using the schema in `models.js`; an empty database has no movie catalogue. Do not use production data for local tests.
 
 The server connects to MongoDB before opening its HTTP listener. If the database connection fails, it does not start listening. `SIGINT` and `SIGTERM` close the listener and MongoDB connection before exit.
 
-`npm start` and `npm run dev` load a root `.env` when it exists. In deployments, the same commands work without that file and externally supplied environment variables take precedence.
+`npm start` and `npm run dev` load a root `.env` when it exists; externally supplied environment variables take precedence. The Docker image starts Node directly, and Compose injects production variables from `.env.production`.
 
 ### Environment
 
@@ -57,22 +77,20 @@ The server connects to MongoDB before opening its HTTP listener. If the database
 | `API_RATE_LIMIT_WINDOW_MS` | `900000` | General API rate-limit window in milliseconds. |
 | `API_RATE_LIMIT_MAX` | `1000` | General API requests allowed per client IP per window. |
 
-All rate-limit settings must be positive integers.
+Supply rate-limit settings as positive integers. The implementation uses integer parsing rather than strict validation of the entire input string.
 
-## Development and validation
+## npm scripts and validation
 
-```sh
-npm start        # start the API
-npm run dev      # start with nodemon
-npm test         # isolated API/process and proxy regression tests
-npm run check    # syntax checks for application modules
-npm run lint     # ESLint 10 flat-config linting
-npm ls --depth=0 # inspect direct installed dependencies
-npm audit --omit=dev
-npm audit
-```
+| Script | Command | Purpose |
+| --- | --- | --- |
+| `start` | `npm start` | Start the API with optional local environment loading. |
+| `dev` | `npm run dev` | Start with nodemon restart support. |
+| `test` | `npm test` | Run isolated API/process and proxy regression tests. |
+| `test:watch` | `npm run test:watch` | Run tests in watch mode. |
+| `check` | `npm run check` | Check application-module syntax. |
+| `lint` | `npm run lint` | Run ESLint 10 with the flat configuration. |
 
-Tests use an isolated in-memory MongoDB instance. They do not use production data or a production connection string.
+Tests use an isolated in-memory MongoDB instance. They do not use production data or a production connection string. Additional dependency inspection commands are `npm ls --depth=0`, `npm audit --omit=dev`, and `npm audit`; these are not package scripts.
 
 ## Authentication and authorization
 
@@ -105,7 +123,7 @@ All JSON bodies and field names below use the existing PascalCase contract.
 | `GET` | `/movies/genre/:Name` | Returns movies whose embedded `Genre.Name` matches `Name`. |
 | `GET` | `/movies/director/:Name` | Returns movies whose embedded `Director.Name` matches `Name`. |
 
-`Genre` and `Director` are embedded movie objects with `Name` fields; they are not ObjectId references.
+`Genre` and `Director` are embedded movie objects with `Name` fields; they are not ObjectId references. User `FavoriteMovies` entries reference Movie ObjectIds.
 
 ### Self-only user routes
 
@@ -123,76 +141,24 @@ There is intentionally no supported `GET /users` endpoint. Requests for a differ
 
 Helmet sets security headers. CORS accepts only configured origins (with local React/Angular development defaults outside production). Login and general API rate limits return `429` when exceeded. Oversized bodies return `413`, malformed JSON returns `400`, and unexpected errors return a safe `500` response without internal details.
 
-## Docker deployment
+## Production deployment
 
-The production image uses Node `24.21.0-bookworm-slim`, production dependencies from the lockfile, and the non-root `node` user. A separate dependency stage includes a native compilation toolchain; the final stage verifies bcrypt hashing and comparison. Only runtime sources and package manifests enter the image. No local environment files are copied.
+The API runs in Docker on Contabo behind Caddy, with MongoDB Atlas remaining external to the VPS deployment. The two-stage image installs production dependencies from the lockfile, keeps its native compilation toolchain in the dependency stage, verifies bcrypt in the runtime image, and runs as the non-root `node` user. Runtime sources and package manifests are copied into the image; local environment files are excluded.
 
-### Local build and smoke test
+`compose.yaml` loads `.env.production`, fixes `NODE_ENV=production` and `PORT=8080`, and joins the external `msd-proxy` network without publishing host ports. The shared Caddy service is managed separately and proxies to `movie-api:8080`. The documented Caddy-only path requires `TRUST_PROXY_HOPS=1`; the application defaults to direct-access mode unless configured. Compose includes an HTTP healthcheck, bounded logs, a restart policy, and graceful shutdown support.
 
-```sh
-npm test
-npm run check
-npm run lint
-docker build --check .
-docker build -t movie-api:local .
-docker run --rm --entrypoint node movie-api:local -e 'const b = require("bcrypt"); console.log(b.compareSync("test", b.hashSync("test", 4)))'
-```
+### Compose deployment variable
 
-For an HTTP smoke test, use a disposable local MongoDB container on a dedicated local network, never Atlas. Create `/tmp/movie-api.docker.env` with a local connection URI, a throwaway JWT secret of at least 32 bytes, `CORS_ALLOWED_ORIGINS=http://localhost:1234`, and `TRUST_PROXY_HOPS=0`.
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `MOVIE_API_IMAGE_TAG` | `local` | Selects the `movie-api` image tag for builds and release updates. Supply it to Compose through the shell or its interpolation environment; it is separate from application runtime variables in `.env.production`. |
 
-```sh
-docker network create movie-api-test
-docker run -d --name movie-api-test-db --network movie-api-test mongo:8
-docker run -d --name movie-api-test --network movie-api-test --env-file /tmp/movie-api.docker.env -p 127.0.0.1:8080:8080 movie-api:local
-# Local connection URI: mongodb://movie-api-test-db:27017/movie-api-test
-curl --fail http://127.0.0.1:8080/
-docker stop movie-api-test
-docker rm movie-api-test
-docker rm -f movie-api-test-db
-docker network rm movie-api-test
-rm /tmp/movie-api.docker.env
-```
+See the [deployment operations guide](docs/deployment.md) for build and smoke tests, production configuration, release commands, rollback, troubleshooting, and details requiring production verification.
 
-The expected response is `Welcome to MyFlix!`. Allow the disposable database time to initialize before starting the API.
+## Historical generated documentation
 
-### Production setup (operator instructions)
+The generated documentation in `out/` is historical and may not reflect the current implementation. Use the API reference above and current source files for the supported contract. These generated files have not been regenerated or deleted.
 
-Use `/opt/msd/projects/movie-api` on the Contabo Ubuntu VPS. Docker Engine, Compose, and Caddy must already be installed. Both Caddy and this service must join the existing external `msd-proxy` network; Compose does not create it. The service publishes no host ports and Caddy uses Docker DNS upstream `movie-api:8080`.
+## License
 
-Copy `.env.production.example` to `.env.production` on the VPS, restrict permissions (`chmod 600 .env.production`), and supply real values securely. The template's JWT placeholder is deliberately rejected. Required values are `CONNECTION_URI` for the existing Atlas database, a unique `JWT_SECRET` of at least 32 bytes, explicit `CORS_ALLOWED_ORIGINS`, and `TRUST_PROXY_HOPS=1` for the Caddy-only path. The template includes the React and Angular production origins and existing request-size/rate-limit defaults. Compose fixes `NODE_ENV=production` and `PORT=8080`. Preserve the existing signing secret during migration if existing tokens must remain valid.
-
-Allowlist the VPS's actual outbound public IP in Atlas, including IPv6 if used. Use a least-privilege Atlas database account and retain TLS; do not allow all internet addresses. Verify outbound DNS and Atlas connectivity from the VPS before migration.
-
-Set the Cloudflare record for `api.myflix.marksavilledesigns.com` to **DNS only**, pointing to the VPS. Only publish an AAAA record if IPv6 reachability is verified. Cloudflare-proxied API traffic would require reassessing the trusted proxy chain and Caddy forwarding configuration before enabling it.
-
-Add this site block to the shared Caddyfile, preserving existing routes:
-
-```caddyfile
-api.myflix.marksavilledesigns.com {
-    reverse_proxy movie-api:8080
-}
-```
-
-Validate and reload Caddy using the existing proxy Compose project. Caddy must overwrite untrusted client-supplied forwarded headers using its normal reverse-proxy behavior. Numeric one-hop trust assumes every incoming connection comes through Caddy: do not expose port 8080, and treat all members of `msd-proxy` as trusted infrastructure. An untrusted container with direct access could supply a forged client IP. Local/direct usage must retain `TRUST_PROXY_HOPS=0`; unrestricted trust is rejected.
-
-When authorized to deploy, an operator can run:
-
-```sh
-cd /opt/msd/projects/movie-api
-sudo docker network inspect msd-proxy
-sudo docker compose config --quiet
-# Use a unique release tag and retain the previous image for rollback.
-sudo env MOVIE_API_IMAGE_TAG=release-identifier docker compose build --pull
-sudo env MOVIE_API_IMAGE_TAG=release-identifier docker compose up -d --no-build
-sudo docker compose ps
-sudo docker compose logs --tail=100 movie-api
-curl --fail https://api.myflix.marksavilledesigns.com/
-```
-
-Avoid printing expanded Compose configuration: it includes environment secrets. The HTTP healthcheck requests the existing public `GET /` inside the container every 30 seconds, with a 4-second request deadline, a 5-second check timeout, three retries, and a 60-second startup allowance. It checks HTTP availability only; it does not query Atlas or create a new endpoint. Health requests count toward the existing API rate limit, so keep that limit above the probe traffic (30 requests per default 15-minute window). An unhealthy status does not itself trigger Docker restart; the restart policy applies to process exits. Logs use Docker's `local` driver, capped at three 10 MB files. `init: true` forwards signals, and shutdown has 45 seconds before forced termination.
-
-### Rollback and cutover
-
-Record the prior release image tag, environment settings, DNS state, and Caddy route before cutover. Keep the previous deployment available until HTTPS, CORS from both clients, authentication, and Atlas connectivity are verified. To roll back the container, restore compatible environment settings and run `MOVIE_API_IMAGE_TAG=previous-release docker compose up -d --no-build` (with the same sudo/environment convention above). Restore DNS/Caddy routing if the cutover requires it. Do not prune retained images until the rollback window closes. Container replacement can briefly interrupt requests; in-memory rate-limit counters reset on restart. Atlas data is external and is not rolled back with the container; maintain database backups separately.
-
-Deployment support is prepared in this repository. No VPS deployment, production connection, DNS change, or Caddy reload is performed by this change.
+ISC, as declared in `package.json`.
