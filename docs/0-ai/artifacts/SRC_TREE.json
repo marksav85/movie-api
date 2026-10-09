@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-27T13:56:15Z",
+  "generatedAt": "2026-10-09T13:49:21Z",
   "root": ".",
   "summary": {
     "totalFiles": 12,
@@ -11,14 +11,15 @@
       "name": "app.js",
       "relativePath": "app.js",
       "extension": ".js",
-      "sizeKB": 1.9,
+      "sizeKB": 2.0,
       "isComponent": false,
       "imports": [
         "config.js",
         "routes/auth.js",
         "routes/movies.js",
         "routes/users.js",
-        "middleware/errors.js"
+        "middleware/errors.js",
+        "passport.js"
       ]
     },
     {
@@ -26,7 +27,7 @@
       "name": "config.js",
       "relativePath": "config.js",
       "extension": ".js",
-      "sizeKB": 2.7,
+      "sizeKB": 3.0,
       "isComponent": false,
       "imports": []
     },
@@ -58,8 +59,8 @@
       "sizeKB": 1.4,
       "isComponent": false,
       "imports": [
-        "config.js",
-        "models.js"
+        "models.js",
+        "config.js"
       ]
     },
     {

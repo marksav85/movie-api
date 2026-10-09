@@ -1,4 +1,4 @@
-// ARTIFACT_META: {"artifactId":"SRC_SNAPSHOT_1","packId":"2026-09-27T13:56:15Z","generatedAt":"2026-09-27T13:56:15Z","generator":"prompt--artifact--generate-snapshot.md"}
+// ARTIFACT_META: {"artifactId":"SRC_SNAPSHOT_1","packId":"2026-10-09T13:49:21Z","generatedAt":"2026-10-09T13:49:21Z","generator":"prompt--artifact--generate-snapshot.md"}
 // ===== FILE: app.js =====
 const express = require("express");
 const { MemoryStore, rateLimit } = require("express-rate-limit");
@@ -14,6 +14,7 @@ const { errorHandler } = require("./middleware/errors");
 require("./passport");
 
 const app = express();
+app.set("trust proxy", config.trustProxyHops);
 
 const corsOptions = {
   origin(origin, callback) {
@@ -63,10 +64,16 @@ app.get("/", (req, res) => res.send("Welcome to MyFlix!"));
 app.use(errorHandler);
 
 module.exports = app;
+
 // ===== FILE: config.js =====
 const exampleJwtSecret = "replace-with-a-long-random-secret";
 const jwtSecret = process.env.JWT_SECRET;
 const nodeEnv = process.env.NODE_ENV || "development";
+const trustProxyValue = process.env.TRUST_PROXY_HOPS ?? "0";
+if (!/^[01]$/.test(trustProxyValue)) {
+  throw new Error("TRUST_PROXY_HOPS must be 0 (direct) or 1 (Caddy only).");
+}
+const trustProxyHops = Number(trustProxyValue);
 const developmentCorsOrigins = [
   "http://localhost:1234",
   "http://127.0.0.1:1234",
@@ -169,7 +176,9 @@ module.exports = {
   loginRateLimitMax,
   loginRateLimitWindowMs,
   nodeEnv,
+  trustProxyHops,
 };
+
 // ===== FILE: index.js =====
 const mongoose = require("mongoose");
 const app = require("./app");
@@ -229,6 +238,7 @@ if (require.main === module) {
 module.exports = app;
 module.exports.startServer = startServer;
 module.exports.shutdown = shutdown;
+
 // ===== FILE: models.js =====
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
@@ -276,6 +286,7 @@ let User = mongoose.model('User', userSchema);
 
 module.exports.Movie = Movie;
 module.exports.User = User;
+
 // ===== FILE: passport.js =====
 const passport = require ('passport'),
     LocalStrategy = require ('passport-local').Strategy,
@@ -321,6 +332,7 @@ passport.use(new JWTStrategy({
         return callback(error);
     }
 }));
+
 // ===== FILE: middleware/authorization.js =====
 const requireSelf = (req, res, next) => {
   if (req.user.Username !== req.params.Username) {
@@ -331,6 +343,7 @@ const requireSelf = (req, res, next) => {
 };
 
 module.exports = { requireSelf };
+
 // ===== FILE: middleware/errors.js =====
 const errorHandler = (err, req, res, _next) => {
   if (err.type === "entity.too.large") {
@@ -350,6 +363,7 @@ const errorHandler = (err, req, res, _next) => {
 };
 
 module.exports = { errorHandler };
+
 // ===== FILE: middleware/resources.js =====
 const mongoose = require("mongoose");
 const { Movie, User } = require("../models");
@@ -386,6 +400,7 @@ const validateFavoriteMovie = async (req, res, next) => {
 };
 
 module.exports = { loadRequestedUser, validateFavoriteMovie };
+
 // ===== FILE: middleware/validation.js =====
 const { validationResult } = require("express-validator");
 
@@ -404,6 +419,7 @@ const validateLoginRequest = validationErrors(400, () => ({
 }));
 
 module.exports = { validateLoginRequest, validateRequest };
+
 // ===== FILE: routes/auth.js =====
 const express = require("express");
 const jwt = require("jsonwebtoken");
@@ -451,6 +467,7 @@ router.post(
 );
 
 module.exports = router;
+
 // ===== FILE: routes/movies.js =====
 const express = require("express");
 const passport = require("passport");
@@ -499,6 +516,7 @@ router.get("/director/:Name", requireJwt, async (req, res, next) => {
 });
 
 module.exports = router;
+
 // ===== FILE: routes/users.js =====
 const express = require("express");
 const passport = require("passport");
