@@ -1,33 +1,34 @@
 {
-  "packId": "2026-10-09T13:49:21Z",
+  "packId": "2026-10-09T14:39:36Z",
   "runMode": "controller",
-  "generatedAt": "2026-10-09T13:49:21Z",
-  "verifiedAt": "2026-10-09T13:49:21Z",
+  "generatedAt": "2026-10-09T14:39:36Z",
+  "verifiedAt": "2026-10-09T14:39:36Z",
   "repoBranch": "refactor/portfolio-update",
-  "repoHead": "9ba290dd998ca0416affa75c640f71a8e32a665a",
+  "repoHead": "33650c256dc24b1f00bc1ac55120d0036f40431a",
   "scopeHeads": {
-    "docsHead": "9ba290dd998ca0416affa75c640f71a8e32a665a",
+    "docsHead": "c20be8268ad3965db7c74bb2e9377a3102a80f09",
     "srcHead": "638027e789ee6761e453f2c3f5e0cb99239ceaf0",
     "depsHead": "bcf9df1870134ea6d98013317216051c4b810c40"
   },
   "dirtyWorkingTree": false,
   "stalenessSummary": {
     "counts": {
-      "flagged": 6,
-      "regenerated": 6,
+      "flagged": 3,
+      "regenerated": 4,
       "acknowledged": 0,
-      "verified": 0
+      "verified": 2
     },
     "scopeChanges": {
       "docs": true,
-      "src": true,
-      "deps": true
+      "src": false,
+      "deps": false
     },
     "warnings": [
-      "Root-level Express source scope is preserved in place of absent src/: app.js, index.js, config.js, models.js, passport.js, routes/, middleware/; tests/ contributes to srcHead but is excluded from tree/snapshot.",
-      "dirtyWorkingTree records the clean pre-generation baseline; the six regenerated artifacts are uncommitted outputs.",
-      "PROJECT_OVERVIEW excludes ignored secret-bearing environment files; only safe template names are inventoried. Deployment architecture comes from current repository documentation, not live infrastructure verification.",
-      "DOCS_TREE inventories generated artifacts too; size metadata is normalized against final outputs before manifest hashing."
+      "Root-level Express scope preserved; tests contribute to srcHead but are excluded from runtime tree/snapshot.",
+      "Clean pre-generation HEAD is recorded; generated outputs remain uncommitted.",
+      "Verified source artifacts retain their original generatedAt and internal packId; this manifest records their current verifiedAt.",
+      "Context summary regeneration also corrects the previous runtime-variable inventory, which mistakenly included HTTP method names and the Compose-only variable.",
+      "Live production infrastructure was not inspected."
     ]
   },
   "artifacts": [
@@ -35,8 +36,8 @@
       "artifactId": "SRC_TREE",
       "path": "docs/0-ai/artifacts/SRC_TREE.json",
       "generatedAt": "2026-10-09T13:49:21Z",
-      "verifiedAt": "2026-10-09T13:49:21Z",
-      "status": "regenerated",
+      "verifiedAt": "2026-10-09T14:39:36Z",
+      "status": "verified",
       "sizeBytes": 3573,
       "contentHash": "f03ba83930f311c6430bd4f49bcdfe6ab02cc1e0e12c80bc8987907647514d00",
       "dependsOnScopes": [
@@ -50,8 +51,8 @@
       "artifactId": "SRC_SNAPSHOT_1",
       "path": "docs/0-ai/artifacts/SRC_SNAPSHOT_1.tsx",
       "generatedAt": "2026-10-09T13:49:21Z",
-      "verifiedAt": "2026-10-09T13:49:21Z",
-      "status": "regenerated",
+      "verifiedAt": "2026-10-09T14:39:36Z",
+      "status": "verified",
       "sizeBytes": 18017,
       "contentHash": "c115c2300440df05a8628d0ed8dc39ac62df58729158942ea733c1adb0e8c324",
       "dependsOnScopes": [
@@ -64,11 +65,11 @@
     {
       "artifactId": "CONTEXT_SUMMARY",
       "path": "docs/0-ai/artifacts/CONTEXT_SUMMARY.md",
-      "generatedAt": "2026-10-09T13:49:21Z",
-      "verifiedAt": "2026-10-09T13:49:21Z",
+      "generatedAt": "2026-10-09T14:39:36Z",
+      "verifiedAt": "2026-10-09T14:39:36Z",
       "status": "regenerated",
-      "sizeBytes": 5911,
-      "contentHash": "19ea474eb3481310d11d9eb6176e6aee65a83154c04bb24ee2180f5788d4a189",
+      "sizeBytes": 5519,
+      "contentHash": "837e924775468ff8dabf9c107e456057db06ef1a786adb5b57883577ad120155",
       "dependsOnScopes": [
         "src"
       ],
@@ -79,40 +80,40 @@
     {
       "artifactId": "PROJECT_OVERVIEW",
       "path": "docs/0-ai/artifacts/PROJECT_OVERVIEW.json",
-      "generatedAt": "2026-10-09T13:49:21Z",
-      "verifiedAt": "2026-10-09T13:49:21Z",
+      "generatedAt": "2026-10-09T14:39:36Z",
+      "verifiedAt": "2026-10-09T14:39:36Z",
       "status": "regenerated",
-      "sizeBytes": 4818,
-      "contentHash": "5fba4fa4a450db258b6644f8404fc8f8484a0455665a10ae53a17e1dd3cd60eb",
+      "sizeBytes": 4769,
+      "contentHash": "ca0eddcea90a76e52c8cf4136bb3acffc7d33dfb620464400616049c2894ef07",
       "dependsOnScopes": [
         "docs",
         "deps"
       ],
       "scopeHeadsAtVerify": {
-        "docsHead": "9ba290dd998ca0416affa75c640f71a8e32a665a",
+        "docsHead": "c20be8268ad3965db7c74bb2e9377a3102a80f09",
         "depsHead": "bcf9df1870134ea6d98013317216051c4b810c40"
       }
     },
     {
       "artifactId": "DOCS_TREE",
       "path": "docs/0-ai/artifacts/DOCS_TREE.json",
-      "generatedAt": "2026-10-09T13:49:21Z",
-      "verifiedAt": "2026-10-09T13:49:21Z",
+      "generatedAt": "2026-10-09T14:39:36Z",
+      "verifiedAt": "2026-10-09T14:39:36Z",
       "status": "regenerated",
       "sizeBytes": 3193,
-      "contentHash": "f03a11dc843baa60dc32f0673fba666fdad5a621c7b5ed78e9ebcfb66676c9e6",
+      "contentHash": "770cdf275b76f1a68d817062dcedd4ffee4dd9e36041d7b51c501673adbd50fe",
       "dependsOnScopes": [
         "docs"
       ],
       "scopeHeadsAtVerify": {
-        "docsHead": "9ba290dd998ca0416affa75c640f71a8e32a665a"
+        "docsHead": "c20be8268ad3965db7c74bb2e9377a3102a80f09"
       }
     },
     {
       "artifactId": "ARTIFACT_PACK_MANIFEST",
       "path": "docs/0-ai/artifacts/ARTIFACT_PACK_MANIFEST.json",
-      "generatedAt": "2026-10-09T13:49:21Z",
-      "verifiedAt": "2026-10-09T13:49:21Z",
+      "generatedAt": "2026-10-09T14:39:36Z",
+      "verifiedAt": "2026-10-09T14:39:36Z",
       "status": "regenerated",
       "dependsOnScopes": [
         "docs",
@@ -120,7 +121,7 @@
         "deps"
       ],
       "scopeHeadsAtVerify": {
-        "docsHead": "9ba290dd998ca0416affa75c640f71a8e32a665a",
+        "docsHead": "c20be8268ad3965db7c74bb2e9377a3102a80f09",
         "srcHead": "638027e789ee6761e453f2c3f5e0cb99239ceaf0",
         "depsHead": "bcf9df1870134ea6d98013317216051c4b810c40"
       },

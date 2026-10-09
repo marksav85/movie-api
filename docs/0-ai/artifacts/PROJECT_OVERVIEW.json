@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-09T13:49:21Z",
+  "generatedAt": "2026-10-09T14:39:36Z",
   "rootTree": {
     "files": [
       ".dockerignore",
@@ -15,7 +15,6 @@
       "compose.yaml",
       "config.js",
       "eslint.config.cjs",
-      "index.html",
       "index.js",
       "models.js",
       "package-lock.json",
@@ -25,10 +24,8 @@
     "folders": [
       "docs",
       "middleware",
-      "out",
       "playbook",
       "routes",
-      "styles",
       "tests"
     ]
   },
