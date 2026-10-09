@@ -155,10 +155,6 @@ The API runs in Docker on Contabo behind Caddy, with MongoDB Atlas remaining ext
 
 See the [deployment operations guide](docs/deployment.md) for build and smoke tests, production configuration, release commands, rollback, troubleshooting, and details requiring production verification.
 
-## Historical generated documentation
-
-The generated documentation in `out/` is historical and may not reflect the current implementation. Use the API reference above and current source files for the supported contract. These generated files have not been regenerated or deleted.
-
 ## License
 
 ISC, as declared in `package.json`.

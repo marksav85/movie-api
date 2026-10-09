@@ -3,7 +3,7 @@ const globals = require("globals");
 
 module.exports = [
   {
-    ignores: ["out/**", "playbook/**", "node_modules/**"],
+    ignores: ["playbook/**", "node_modules/**"],
   },
   js.configs.recommended,
   {
