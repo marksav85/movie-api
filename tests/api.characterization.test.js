@@ -196,6 +196,62 @@ test("POST /users retains registration validation and omits Password from its re
   assert.equal(Object.hasOwn(response.body, "Password"), false);
 });
 
+test("registration rejects invalid fields with useful errors and hides password values", async () => {
+  const valid = { Username: "ValidUser123", Password: "abcdefgh", Email: "valid@example.test" };
+  const cases = [
+    ["Username", "abcd", "at least 5"],
+    ["Username", "user name", "ASCII"],
+    ["Username", "user_name", "ASCII"],
+    ["Username", "üsername", "ASCII"],
+    ["Username", 12345, "string"],
+    ["Password", "1234567", "at least 8"],
+    ["Password", "a".repeat(73), "72 UTF-8 bytes"],
+    ["Password", "é".repeat(37), "72 UTF-8 bytes"],
+    ["Password", 12345678, "string"],
+    ["Email", "invalid", "valid"],
+    ["Birthday", "2023-02-29", "calendar date"],
+    ["Birthday", "2024-04-31", "calendar date"],
+    ["Birthday", "2000-01-01T00:00:00Z", "YYYY-MM-DD"],
+    ["Birthday", "9999-12-31", "future"],
+  ];
+  for (const [field, value, message] of cases) {
+    const response = await request(app).post("/users").send({ ...valid, [field]: value });
+    assert.equal(response.status, 422, `${field}: ${value}`);
+    assert.ok(response.body.errors.some((error) => error.path === field && error.msg.includes(message)));
+    for (const error of response.body.errors.filter((error) => error.path === "Password")) {
+      assert.equal(Object.hasOwn(error, "value"), false);
+    }
+  }
+  const queryOnly = await request(app).post("/users?Username=ValidUser123&Password=abcdefgh&Email=valid@example.test").send({});
+  assert.equal(queryOnly.status, 422);
+});
+
+test("registration accepts password boundaries, valid dates, and omits blank birthdays", async () => {
+  const cases = [
+    ["abcdefgh", "2000-02-29"],
+    ["a".repeat(72), new Date().toISOString().slice(0, 10)],
+    ["é".repeat(36), undefined],
+    ["        ", ""],
+    ["abcdefgh", "   "],
+    ["abcdefgh", null],
+  ];
+  for (const [i, [password, birthday]] of cases.entries()) {
+    const response = await request(app).post("/users").send({
+      Username: `BoundaryUser${i}`, Password: password, Email: "shared@example.test",
+      ...(birthday === undefined ? {} : { Birthday: birthday }),
+    });
+    assert.equal(response.status, 201);
+    assert.equal(Object.hasOwn(response.body, "Password"), false);
+    const stored = await Users.findById(response.body._id);
+    assert.ok(stored.validatePassword(password));
+    if (!birthday || birthday.trim() === "") {
+      assert.equal(Object.hasOwn(stored.toObject(), "Birthday"), false);
+    } else {
+      assert.equal(stored.Birthday.toISOString().slice(0, 10), birthday);
+    }
+  }
+});
+
 test("POST /login returns a configured JWT and omits Password without credential logging", async () => {
   const originalConsoleLog = console.log;
   const loggedValues = [];
@@ -366,20 +422,49 @@ test("GET /users/:Username permits self access and rejects another user", async 
   assert.deepEqual(otherUser.body, { message: "Forbidden" });
 });
 
-test("PUT /users/:Username requires missing or empty Password without changing the user", async () => {
+test("profile updates preserve passwords when omitted or blank", async () => {
   const before = await Users.findById(primaryUser.id);
   for (const password of [undefined, ""]) {
-    const response = await request(app)
-      .put(`/users/${primaryUser.Username}`)
+    const response = await request(app).put(`/users/${primaryUser.Username}`)
       .set(authHeaderFor(primaryUser))
-      .send({ Username: primaryUser.Username, Email: "not-applied@example.test", ...(password === undefined ? {} : { Password: password }) });
-    assert.equal(response.status, 422);
-    assert.ok(response.body.errors.some(error => error.path === "Password" && error.msg === "Password is required"));
+      .send({ Username: primaryUser.Username, Email: "details@example.test", ...(password === undefined ? {} : { Password: password }) });
+    assert.equal(response.status, 201);
+    assert.equal((await Users.findById(primaryUser.id)).Password, before.Password);
     assert.equal(Object.hasOwn(response.body, "Password"), false);
-    const after = await Users.findById(primaryUser.id);
-    assert.equal(after.Password, before.Password);
-    assert.equal(after.Email, before.Email);
   }
+});
+
+test("legacy users retain short passwords and unchanged usernames during profile updates", async () => {
+  const user = await Users.create({ Username: "old-u", Password: Users.hashPassword("short"), Email: "legacy@example.test", Birthday: "1990-01-01" });
+  for (const password of [undefined, "short"]) {
+    const response = await request(app).put(`/users/${user.Username}`).set(authHeaderFor(user))
+      .send({ Username: user.Username, Email: "updated@example.test", Birthday: "", ...(password === undefined ? {} : { Password: password }) });
+    assert.equal(response.status, 201);
+    const stored = await Users.findById(user.id);
+    assert.equal(stored.Password, user.Password);
+    assert.equal(stored.Birthday.toISOString().slice(0, 10), "1990-01-01");
+  }
+  const login = await request(app).post("/login").send({ Username: user.Username, Password: "short" });
+  assert.equal(login.status, 200);
+});
+
+test("profile validation rejects invalid replacements without changing stored data", async () => {
+  const user = await Users.create({ Username: "ProfileUser", Password: Users.hashPassword("originalpassword"), Email: "profile@example.test" });
+  for (const [field, value] of [["Username", "abcd"], ["Username", "bad name"], ["Password", "short"], ["Password", "é".repeat(37)], ["Password", null], ["Birthday", "2023-02-29"], ["Birthday", "2000-01-01T00:00:00Z"], ["Birthday", "9999-12-31"]]) {
+    const response = await request(app).put(`/users/${user.Username}`).set(authHeaderFor(user))
+      .send({ Username: user.Username, Email: user.Email, [field]: value });
+    assert.equal(response.status, 422);
+    assert.ok(response.body.errors.some(error => error.path === field));
+    for (const error of response.body.errors.filter(error => error.path === "Password")) assert.equal(Object.hasOwn(error, "value"), false);
+    assert.equal((await Users.findById(user.id)).Password, user.Password);
+  }
+  const accepted = await request(app).put(`/users/${user.Username}`).set(authHeaderFor(user))
+    .send({ Username: "RenamedUser", Password: "é".repeat(36), Email: user.Email, Birthday: "2000-02-29" });
+  assert.equal(accepted.status, 201);
+  const stored = await Users.findById(user.id);
+  assert.equal(stored.Username, "RenamedUser");
+  assert.ok(stored.validatePassword("é".repeat(36)));
+  assert.equal(stored.Birthday.toISOString().slice(0, 10), "2000-02-29");
 });
 
 test("PUT /users/:Username rehashes the same effective password and preserves login", async () => {
