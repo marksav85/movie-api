@@ -1,30 +1,30 @@
-const js = require("@eslint/js");
-const globals = require("globals");
+const js = require('@eslint/js');
+const globals = require('globals');
 
 module.exports = [
   {
-    ignores: ["playbook/**", "node_modules/**"],
+    ignores: ['node_modules/**'],
   },
   js.configs.recommended,
   {
-    files: ["**/*.js"],
+    files: ['**/*.js'],
     languageOptions: {
       ecmaVersion: 2021,
-      sourceType: "commonjs",
+      sourceType: 'commonjs',
       globals: globals.node,
     },
     rules: {
-      "no-console": "off",
-      "no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
+      'no-console': 'off',
+      'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
     },
   },
   {
-    files: ["tests/**/*.js"],
+    files: ['tests/**/*.js'],
     languageOptions: {
       globals: {
-        after: "readonly",
-        before: "readonly",
-        test: "readonly",
+        after: 'readonly',
+        before: 'readonly',
+        test: 'readonly',
       },
     },
   },
