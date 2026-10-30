@@ -1,5 +1,6 @@
-const { validationResult } = require("express-validator");
+const { validationResult } = require('express-validator');
 
+// Reuse validation handling while preserving each route's error response shape.
 const validationErrors = (status, bodyForErrors) => (req, res, next) => {
   const errors = validationResult(req);
   if (errors.isEmpty()) {
@@ -11,7 +12,7 @@ const validationErrors = (status, bodyForErrors) => (req, res, next) => {
 
 const validateRequest = validationErrors(422, (errors) => ({ errors: errors.array() }));
 const validateLoginRequest = validationErrors(400, () => ({
-  message: "Invalid login credentials",
+  message: 'Invalid login credentials',
 }));
 
 module.exports = { validateLoginRequest, validateRequest };

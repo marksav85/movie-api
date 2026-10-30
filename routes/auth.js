@@ -1,34 +1,36 @@
-const express = require("express");
-const jwt = require("jsonwebtoken");
-const passport = require("passport");
-const { body } = require("express-validator");
-const { jwtSecret } = require("../config");
-const { validateLoginRequest } = require("../middleware/validation");
+const express = require('express');
+const jwt = require('jsonwebtoken');
+const passport = require('passport');
+const { body } = require('express-validator');
+const { jwtSecret } = require('../config');
+const { validateLoginRequest } = require('../middleware/validation');
 
 const router = express.Router();
 
+// Sign the authenticated user payload as a seven-day bearer token.
 const generateJWTToken = (user) =>
   jwt.sign(user, jwtSecret, {
     subject: user.Username,
-    expiresIn: "7d",
-    algorithm: "HS256",
+    expiresIn: '7d',
+    algorithm: 'HS256',
   });
 
+// Validate credentials, authenticate locally, and return the user with a token.
 router.post(
-  "/",
+  '/',
   [
-    body("Username").isString().trim().notEmpty(),
-    body("Password").isString().notEmpty(),
+    body('Username').isString().trim().notEmpty(),
+    body('Password').isString().notEmpty(),
     validateLoginRequest,
   ],
   (req, res, next) => {
-    passport.authenticate("local", { session: false }, (error, user) => {
+    passport.authenticate('local', { session: false }, (error, user) => {
       if (error) {
         return next(error);
       }
       if (!user) {
         return res.status(400).json({
-          message: "Something is not right",
+          message: 'Something is not right',
           user: user,
         });
       }
@@ -40,7 +42,7 @@ router.post(
         return res.json({ user, token });
       });
     })(req, res, next);
-  }
+  },
 );
 
 module.exports = router;

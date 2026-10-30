@@ -1,11 +1,12 @@
-const mongoose = require("mongoose");
-const { Movie, User } = require("../models");
+const mongoose = require('mongoose');
+const { Movie, User } = require('../models');
 
+// Load the target user before route authorization checks.
 const loadRequestedUser = async (req, res, next) => {
   try {
     const user = await User.findOne({ Username: req.params.Username });
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ message: 'User not found' });
     }
 
     req.requestedUser = user;
@@ -15,15 +16,16 @@ const loadRequestedUser = async (req, res, next) => {
   }
 };
 
+// Validate favourite movie IDs and confirm the referenced movie exists.
 const validateFavoriteMovie = async (req, res, next) => {
   if (!mongoose.isObjectIdOrHexString(req.params.MovieID)) {
-    return res.status(400).json({ message: "MovieID must be a valid MongoDB ObjectId" });
+    return res.status(400).json({ message: 'MovieID must be a valid MongoDB ObjectId' });
   }
 
   try {
     const movieExists = await Movie.exists({ _id: req.params.MovieID });
     if (!movieExists) {
-      return res.status(404).json({ message: "Movie not found" });
+      return res.status(404).json({ message: 'Movie not found' });
     }
 
     return next();
