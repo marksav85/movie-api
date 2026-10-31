@@ -1,8 +1,8 @@
 # Movie API — Project Instructions
 
-## Shared development standards
+## Repository boundaries
 
-For YELLOW FLAG external reads, RED FLAG external non-repository writes, repository isolation, and the standalone MSD Projects Playbook location and read-only authorization, follow the global Codex instructions at `~/.codex/AGENTS.md`. Consult relevant Playbook guidance through the standalone location defined there. Do not restore, initialize, add, or copy a Playbook submodule into this repository. When working here, do not modify the external Playbook repository.
+Make project changes within this Movie API repository. Treat other repositories as separate protected workspaces; do not modify them from this repository.
 
 ## Project context
 
